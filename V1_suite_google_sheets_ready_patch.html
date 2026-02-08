@@ -1,0 +1,4707 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>SIMT — Suite (Kiosk + Manager) • Multi‑Project</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+
+    <style>
+        :root {
+            --bg: #ffffff;
+            --panel: #ffffff;
+            --card: #ffffff;
+            --text: #0b1220;
+            --muted: #5b677a;
+            --border: #e6e8ef;
+            --shadow: 0 18px 40px rgba(15, 23, 42, .10);
+            --shadow-soft: 0 10px 24px rgba(15, 23, 42, .08);
+            --brand: #16a34a;
+            --info: #2563eb;
+            --warn: #f59e0b;
+            --bad: #ef4444;
+            --radius: 18px;
+            --radius-sm: 14px;
+            --focus: 0 0 0 4px rgba(37, 99, 235, .18);
+            --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+        }
+
+        * {
+            box-sizing: border-box
+        }
+
+        body {
+            margin: 0;
+            font-family: "IBM Plex Sans Arabic", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+            color: var(--text);
+            background: var(--bg);
+            line-height: 1.65;
+            font-size: 16px;
+        }
+
+        /* ======= Top Nav (reference-like) ======= */
+        .topbar {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(255, 255, 255, .95);
+            backdrop-filter: blur(14px);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .topbar-inner {
+            max-width: 1240px;
+            margin: 0 auto;
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            min-width: 240px;
+        }
+
+        .logo {
+            width: 44px;
+            height: 44px;
+            border-radius: 16px;
+            background: linear-gradient(135deg, rgba(22, 163, 74, .95), rgba(37, 99, 235, .85));
+            display: grid;
+            place-items: center;
+            font-weight: 900;
+            color: #07101f;
+            box-shadow: var(--shadow-soft);
+            flex: 0 0 auto;
+        }
+
+        .brand h1 {
+            margin: 0;
+            font-size: 18px;
+            letter-spacing: .2px
+        }
+
+        .brand p {
+            margin: 2px 0 0;
+            color: var(--muted);
+            font-size: 13px
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .tab {
+            border: 1px solid var(--border);
+            background: rgba(15, 23, 42, .03);
+            padding: 10px 12px;
+            border-radius: 999px;
+            font-weight: 900;
+            font-size: 14px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            user-select: none;
+            transition: transform .08s ease, background .12s ease, border-color .12s ease;
+        }
+
+        .tab:active {
+            transform: scale(.99);
+        }
+
+        .tab.active {
+            background: rgba(22, 163, 74, .12);
+            border-color: rgba(22, 163, 74, .30);
+        }
+
+        .tools {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-inline-start: auto;
+        }
+
+        .pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 12px;
+            border-radius: 999px;
+            border: 1px solid var(--border);
+            background: rgba(15, 23, 42, .03);
+            color: var(--muted);
+            font-size: 13px;
+            white-space: nowrap;
+        }
+
+        .pill .mono {
+            font-family: var(--mono);
+            color: var(--text);
+            font-weight: 900;
+        }
+
+        /* ======= Controls ======= */
+        input,
+        select,
+        textarea {
+            width: 100%;
+            border: 1px solid var(--border);
+            background: rgba(15, 23, 42, .03);
+            color: var(--text);
+            border-radius: 14px;
+            padding: 12px 12px;
+            font-family: inherit;
+            font-size: 15px;
+            outline: none;
+        }
+
+        input:focus,
+        select:focus,
+        textarea:focus {
+            box-shadow: var(--focus);
+            border-color: rgba(37, 99, 235, .55);
+        }
+
+        textarea {
+            min-height: 96px;
+            resize: vertical;
+        }
+
+        .btn {
+            border: 1px solid var(--border);
+            background: rgba(15, 23, 42, .03);
+            color: var(--text);
+            padding: 12px 14px;
+            border-radius: 14px;
+            cursor: pointer;
+            font-weight: 900;
+            font-size: 14px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            user-select: none;
+            transition: transform .08s ease, background .12s ease, border-color .12s ease;
+        }
+
+        .btn:hover {
+            background: rgba(15, 23, 42, .05);
+        }
+
+        .btn:active {
+            transform: scale(.99);
+        }
+
+        .btn.primary {
+            background: rgba(22, 163, 74, .10);
+            border-color: rgba(22, 163, 74, .30);
+        }
+
+        .btn.primary:hover {
+            background: rgba(22, 163, 74, .14);
+        }
+
+        .btn.info {
+            background: rgba(37, 99, 235, .10);
+            border-color: rgba(37, 99, 235, .28);
+        }
+
+        .btn.info:hover {
+            background: rgba(37, 99, 235, .14);
+        }
+
+        .btn.danger {
+            background: rgba(239, 68, 68, .09);
+            border-color: rgba(239, 68, 68, .26);
+        }
+
+        .btn.danger:hover {
+            background: rgba(239, 68, 68, .13);
+        }
+
+        /* ======= Layout ======= */
+        .container {
+            max-width: 1240px;
+            margin: 0 auto;
+            padding: 18px 16px 34px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 14px;
+        }
+
+        .card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 16px;
+        }
+
+        .card h2,
+        .card h3 {
+            margin: 0 0 10px 0;
+            font-size: 16px;
+            letter-spacing: .1px;
+        }
+
+        .sub {
+            margin: -6px 0 10px;
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        .note {
+            color: var(--muted);
+            font-size: 13px;
+            line-height: 1.75;
+        }
+
+        .sep {
+            height: 1px;
+            background: var(--border);
+            margin: 12px 0;
+        }
+
+        .span-12 {
+            grid-column: span 12;
+        }
+
+        .span-8 {
+            grid-column: span 8;
+        }
+
+        .span-7 {
+            grid-column: span 7;
+        }
+
+        .span-6 {
+            grid-column: span 6;
+        }
+
+        .span-5 {
+            grid-column: span 5;
+        }
+
+        .span-4 {
+            grid-column: span 4;
+        }
+
+        .span-3 {
+            grid-column: span 3;
+        }
+
+        @media (max-width: 980px) {
+
+            .span-8,
+            .span-7,
+            .span-6,
+            .span-5,
+            .span-4,
+            .span-3 {
+                grid-column: span 12;
+            }
+
+            .container {
+                padding: 14px 12px 26px;
+            }
+
+            .brand {
+                min-width: unset;
+            }
+        }
+
+        /* ======= KPI ======= */
+        .kpis {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+        }
+
+        @media (max-width: 980px) {
+            .kpis {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 520px) {
+            .kpis {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .kpi {
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 14px;
+            background: rgba(15, 23, 42, .02);
+        }
+
+        .kpi .label {
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        .kpi .value {
+            font-size: 24px;
+            font-weight: 900;
+            margin-top: 6px;
+            display: flex;
+            gap: 10px;
+            align-items: baseline;
+        }
+
+        .badge {
+            font-size: 13px;
+            padding: 5px 10px;
+            border-radius: 999px;
+            border: 1px solid var(--border);
+            color: var(--muted);
+            background: rgba(15, 23, 42, .03);
+            white-space: nowrap;
+        }
+
+        .badge.good {
+            color: var(--brand);
+            border-color: rgba(22, 163, 74, .25);
+            background: rgba(22, 163, 74, .08);
+        }
+
+        .badge.warn {
+            color: var(--warn);
+            border-color: rgba(245, 158, 11, .25);
+            background: rgba(245, 158, 11, .08);
+        }
+
+        .badge.bad {
+            color: var(--bad);
+            border-color: rgba(239, 68, 68, .25);
+            background: rgba(239, 68, 68, .08);
+        }
+
+        .badge.info {
+            color: var(--info);
+            border-color: rgba(37, 99, 235, .25);
+            background: rgba(37, 99, 235, .08);
+        }
+
+        /* ======= Tables ======= */
+        .table-wrap {
+            overflow: auto;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border);
+            background: rgba(15, 23, 42, .02);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 860px;
+            font-size: 14px;
+        }
+
+        th,
+        td {
+            padding: 12px 12px;
+            border-bottom: 1px solid var(--border);
+            text-align: right;
+            white-space: nowrap;
+        }
+
+        th {
+            position: sticky;
+            top: 0;
+            background: rgba(255, 255, 255, .96);
+            backdrop-filter: blur(10px);
+            z-index: 1;
+            font-size: 13px;
+            color: var(--muted);
+        }
+
+        tr:hover td {
+            background: rgba(37, 99, 235, .06);
+        }
+
+        td.mono {
+            font-family: var(--mono);
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        /* ======= Inbox/Chat ======= */
+        .inbox {
+            display: grid;
+            grid-template-columns: 360px 1fr;
+            gap: 12px;
+            min-height: 560px;
+        }
+
+        @media (max-width: 980px) {
+            .inbox {
+                grid-template-columns: 1fr;
+                min-height: unset;
+            }
+        }
+
+        .list {
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            background: rgba(15, 23, 42, .02);
+            overflow: hidden;
+        }
+
+        .list-head {
+            padding: 12px;
+            border-bottom: 1px solid var(--border);
+            background: rgba(255, 255, 255, .92);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .list-body {
+            max-height: 560px;
+            overflow: auto;
+        }
+
+        .item {
+            padding: 12px;
+            border-bottom: 1px solid var(--border);
+            cursor: pointer;
+            background: rgba(255, 255, 255, .80);
+        }
+
+        .item:hover {
+            background: rgba(37, 99, 235, .06);
+        }
+
+        .item.active {
+            background: rgba(22, 163, 74, .12);
+        }
+
+        .item .top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            margin-bottom: 6px;
+        }
+
+        .item .name {
+            font-weight: 900;
+            font-size: 14px;
+        }
+
+        .item .meta {
+            color: var(--muted);
+            font-size: 13px;
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .dot {
+            width: 9px;
+            height: 9px;
+            border-radius: 50%;
+            display: inline-block;
+            background: var(--muted);
+            margin-inline: 8px 0;
+        }
+
+        .dot.good {
+            background: var(--brand);
+        }
+
+        .dot.bad {
+            background: var(--bad);
+        }
+
+        .dot.info {
+            background: var(--info);
+        }
+
+        .chat {
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            background: rgba(15, 23, 42, .02);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chat-head {
+            padding: 12px;
+            border-bottom: 1px solid var(--border);
+            background: rgba(255, 255, 255, .92);
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .chat-head .t {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .chat-head .t strong {
+            font-size: 14px;
+        }
+
+        .chat-head .t span {
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        .chat-body {
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            max-height: 380px;
+            overflow: auto;
+        }
+
+        .bubble {
+            max-width: 92%;
+            padding: 12px 12px;
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            background: rgba(255, 255, 255, .96);
+            box-shadow: 0 8px 18px rgba(15, 23, 42, .06);
+        }
+
+        .bubble.admin {
+            align-self: flex-end;
+            background: rgba(22, 163, 74, .10);
+            border-color: rgba(22, 163, 74, .22);
+        }
+
+        .bubble.user {
+            align-self: flex-start;
+            background: rgba(37, 99, 235, .10);
+            border-color: rgba(37, 99, 235, .20);
+        }
+
+        .bubble .meta {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 8px;
+            color: var(--muted);
+            font-size: 12px;
+        }
+
+        .bubble .meta .who {
+            font-weight: 900;
+            color: var(--text);
+        }
+
+        .bubble .msg {
+            font-size: 14px;
+            line-height: 1.7;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+
+        .chat-foot {
+            margin-top: auto;
+            padding: 12px;
+            border-top: 1px solid var(--border);
+            background: rgba(255, 255, 255, .92);
+            display: grid;
+            grid-template-columns: 1fr 180px;
+            gap: 10px;
+            align-items: end;
+        }
+
+        @media (max-width: 520px) {
+            .chat-foot {
+                grid-template-columns: 1fr;
+            }
+
+            .chat-body {
+                max-height: 330px;
+            }
+
+            .chat-foot .btn {
+                width: 100%;
+            }
+        }
+
+        /* ======= Kiosk layout ======= */
+        .kiosk-grid {
+            display: grid;
+            grid-template-columns: 1.1fr .9fr;
+            gap: 14px;
+        }
+
+        @media (max-width: 980px) {
+            .kiosk-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 520px) {
+            .mobile-actions {
+                position: sticky;
+                bottom: 12px;
+                z-index: 20;
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 10px;
+                padding: 10px;
+                border-radius: 16px;
+                border: 1px solid var(--border);
+                background: rgba(255, 255, 255, .96);
+                box-shadow: var(--shadow-soft);
+                backdrop-filter: blur(10px);
+            }
+
+            .mobile-actions .btn {
+                width: 100%;
+            }
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 18px;
+            left: 18px;
+            right: 18px;
+            max-width: 640px;
+            margin-inline: auto;
+            background: rgba(255, 255, 255, .96);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 12px 12px;
+            box-shadow: var(--shadow);
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 12px;
+            z-index: 1000;
+        }
+
+        .toast strong {
+            font-size: 14px;
+        }
+
+        .toast p {
+            margin: 2px 0 0;
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* ===== Payments Tab (rebuild) ===== */
+        #view-payments .grid.grid-2 {
+            grid-template-columns: 1.15fr .85fr;
+            gap: 14px;
+        }
+
+        #view-payments textarea {
+            width: 100%;
+            min-height: 92px;
+            resize: vertical;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 10px 12px;
+            font-family: inherit;
+            font-size: 14px;
+            background: #fff;
+            outline: none;
+        }
+
+        #view-payments .card.soft {
+            background: rgba(0, 0, 0, .02);
+            border: 1px solid var(--border);
+        }
+
+        #view-payments .item {
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 12px;
+            margin-bottom: 10px;
+            background: #fff;
+        }
+
+        #view-payments .item .meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        #view-payments .item .actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 10px;
+            flex-wrap: wrap;
+        }
+
+        #view-payments .item .actions .btn {
+            padding: 10px 12px;
+        }
+
+        @media (max-width: 900px) {
+            #view-payments .grid.grid-2 {
+                grid-template-columns: 1fr;
+            }
+        }
+
+
+        #view-settings .card {
+            padding: 16px;
+        }
+
+        #view-settings .field {
+            min-width: 160px;
+        }
+
+
+        #view-settings .settings-nav {
+            position: relative;
+            top: auto;
+        }
+
+
+
+        /* ===== Settings: Employee Cards ===== */
+        #view-settings .empCards {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+        }
+
+        #view-settings .empCard {
+            border: 1px solid rgba(0, 0, 0, .08);
+            border-radius: 16px;
+            padding: 14px;
+            background: #fff;
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        #view-settings .empCard.off {
+            opacity: .55;
+        }
+
+        #view-settings .empCard .left {
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+        }
+
+        #view-settings .avatar {
+            width: 42px;
+            height: 42px;
+            border-radius: 14px;
+            border: 1px solid rgba(0, 0, 0, .10);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+            background: rgba(0, 0, 0, .02);
+        }
+
+        #view-settings .empCard .name {
+            font-weight: 900;
+            font-size: 14.5px;
+            line-height: 1.2;
+        }
+
+        #view-settings .empCard .subline {
+            color: var(--muted);
+            font-size: 12.5px;
+            margin-top: 4px;
+        }
+
+        #view-settings .empCard .tags {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            margin-top: 8px;
+        }
+
+        #view-settings .empCard .actionsCol {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            align-items: flex-end;
+        }
+
+        #view-settings .fileHint {
+            font-size: 12px;
+            color: var(--muted);
+            margin-top: 8px;
+        }
+
+        #view-settings .logoPreview {
+            width: 44px;
+            height: 44px;
+            border-radius: 14px;
+            border: 1px solid rgba(0, 0, 0, .10);
+            background: rgba(0, 0, 0, .02);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        #view-settings .logoPreview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+
+        #view-settings .settings-nav {
+            position: relative;
+            top: auto;
+        }
+
+
+        #view-settings .card {
+            padding: 16px;
+        }
+
+        #view-settings .settings-content {
+            gap: 14px;
+        }
+
+
+
+        #view-settings .settingsNav {
+            position: relative;
+            top: auto;
+            padding: 16px;
+        }
+
+        #view-settings .settingsBody {
+            padding: 16px;
+        }
+
+        #view-settings .settingsSplit {
+            grid-template-columns: 1fr;
+            gap: 14px;
+        }
+
+
+
+        #view-settings .settingsNav {
+            position: relative;
+            top: auto;
+            padding: 16px;
+        }
+
+        #view-settings .settingsBody {
+            padding: 16px;
+        }
+
+
+
+        /* ===== Settings: Practical Drawer Layout (v13) ===== */
+        #view-settings .settingsWrapDrawer {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 18px;
+            align-items: start;
+        }
+
+        #view-settings .settingsNav {
+            position: relative;
+            top: auto;
+            align-self: stretch;
+            padding: 18px;
+            height: 100%;
+        }
+
+        #view-settings .settingsNav .list {
+            max-height: calc(100vh - 220px);
+            overflow: auto;
+            padding-right: 4px;
+        }
+
+        #view-settings #settingsNav {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        #view-settings .snav {
+            width: 100%;
+            text-align: right;
+            border: 1px solid var(--border);
+            background: #fff;
+            padding: 14px 14px;
+            border-radius: 16px;
+            font-family: inherit;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        #view-settings .snav.active {
+            background: rgba(0, 0, 0, .03);
+            border-color: rgba(0, 0, 0, .18);
+            font-weight: 800;
+        }
+
+        #view-settings .settingsBodyDrawer {
+            padding: 20px;
+            position: relative;
+            overflow: auto;
+            height: 100%;
+            max-height: calc(100vh - 180px);
+        }
+
+        /* Drawer */
+        #view-settings .sDrawer {
+            position: fixed;
+            inset: 0;
+            display: none;
+            z-index: 9999;
+        }
+
+        #view-settings .sDrawer.open {
+            display: block;
+        }
+
+        #view-settings .sDrawerBackdrop {
+            position: absolute;
+            inset: 0;
+            background: rgba(0, 0, 0, .35);
+        }
+
+        #view-settings .sDrawerPanel {
+            position: absolute;
+            top: 0;
+            right: 0;
+            height: 100%;
+            width: min(520px, 92vw);
+            background: #fff;
+            border-left: 1px solid rgba(0, 0, 0, .10);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, .25);
+            display: flex;
+            flex-direction: column;
+        }
+
+        #view-settings .sDrawerHead {
+            padding: 16px 16px;
+            border-bottom: 1px solid rgba(0, 0, 0, .08);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        #view-settings .sDrawerHead .title {
+            font-size: 18px;
+            font-weight: 900;
+        }
+
+        #view-settings .sDrawerHead .sub {
+            font-size: 12.5px;
+            color: var(--muted);
+            margin-top: 4px;
+        }
+
+        #view-settings .sDrawerBody {
+            padding: 16px;
+            overflow: auto;
+        }
+
+        #view-settings .sDrawerBody .row {
+            margin-top: 14px;
+            gap: 14px;
+        }
+
+        #view-settings .sDrawerBody .actions {
+            margin-top: 16px;
+        }
+
+        /* General view renders inline (no drawer needed) */
+        #view-settings .generalInline .head {
+            margin-bottom: 14px;
+        }
+
+        #view-settings .generalInline .row {
+            margin-top: 14px;
+            gap: 14px;
+        }
+
+        #view-settings .generalInline .actions {
+            margin-top: 16px;
+        }
+
+        @media (max-width: 980px) {
+            #view-settings .settingsWrapDrawer {
+                grid-template-columns: 1fr;
+                gap: 14px;
+            }
+
+            #view-settings .settingsNav {
+                position: relative;
+                top: auto;
+                padding: 16px;
+            }
+
+            #view-settings .settingsBodyDrawer {
+                padding: 16px;
+            }
+
+            #view-settings .sDrawerPanel {
+                width: 100vw;
+            }
+        }
+
+
+        /* ===== Settings Projects: Budget + Stats (v15) ===== */
+        #view-settings .projRow {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 12px;
+        }
+
+        #view-settings .projMeta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: 8px;
+        }
+
+        #view-settings .projMeta .pill.small {
+            font-size: 12px;
+        }
+
+        #view-settings .itemRow.budgetOver {
+            background: rgba(255, 87, 87, .12);
+            border-color: rgba(255, 87, 87, .35);
+        }
+
+        #view-settings .itemRow.budgetOver .name {
+            font-weight: 900;
+        }
+
+        #view-settings .mutedTiny {
+            font-size: 12px;
+            color: var(--muted);
+            margin-top: 6px;
+            line-height: 1.5;
+        }
+
+        #view-overview .exportRow {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            align-items: end;
+            justify-content: flex-start;
+            margin-top: 12px;
+        }
+
+        #view-overview .exportRow .field {
+            min-width: 240px;
+            flex: 1;
+        }
+
+
+        /* ===== Overview Report UI (v16) ===== */
+        #ovReportsCard .cardsGrid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 12px;
+            margin-top: 14px;
+        }
+
+        #ovReportsCard .statCard {
+            border: 1px solid var(--line);
+            background: var(--panel);
+            border-radius: 16px;
+            padding: 12px;
+        }
+
+        #ovReportsCard .statCard .k {
+            color: var(--muted);
+            font-size: 12px;
+        }
+
+        #ovReportsCard .statCard .v {
+            font-size: 18px;
+            font-weight: 900;
+            margin-top: 6px;
+            letter-spacing: .2px;
+        }
+
+        #ovReportsCard .split2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 12px;
+        }
+
+        #ovReportsCard .barWrap {
+            margin-top: 10px;
+        }
+
+        #ovReportsCard .bar {
+            height: 10px;
+            background: rgba(0, 0, 0, .07);
+            border-radius: 999px;
+            overflow: hidden;
+        }
+
+        #ovReportsCard .bar>i {
+            display: block;
+            height: 100%;
+            width: 0%;
+            background: rgba(0, 0, 0, .65);
+        }
+
+        #ovReportsCard .barMeta {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 8px;
+            color: var(--muted);
+            font-size: 12px;
+        }
+
+        @media (min-width: 980px) {
+            #ovReportsCard .cardsGrid {
+                grid-template-columns: repeat(4, minmax(0, 1fr));
+            }
+        }
+
+
+        /* ===== Overview Report Redesign (v17) ===== */
+        #ovReportsCard {
+            overflow: hidden;
+        }
+
+        #ovReportsCard .exportRow {
+            margin-top: 10px;
+        }
+
+        #ovReportsCard .cardsGrid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 12px;
+            margin-top: 14px;
+        }
+
+        #ovReportsCard .statBox {
+            border: 1px solid var(--line);
+            background: linear-gradient(180deg, rgba(0, 0, 0, .02), rgba(0, 0, 0, .0));
+            border-radius: 18px;
+            padding: 12px 12px 10px;
+        }
+
+        #ovReportsCard .statBox .k {
+            color: var(--muted);
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        #ovReportsCard .statBox .dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 999px;
+            background: rgba(0, 0, 0, .2);
+        }
+
+        #ovReportsCard .statBox .v {
+            font-size: 20px;
+            font-weight: 950;
+            margin-top: 8px;
+            letter-spacing: .2px;
+        }
+
+        #ovReportsCard .statBox .s {
+            color: var(--muted);
+            font-size: 12px;
+            margin-top: 6px;
+        }
+
+        #ovReportsCard .pillMini {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            border: 1px solid var(--line);
+            padding: 4px 8px;
+            border-radius: 999px;
+            font-size: 12px;
+            color: var(--muted);
+            background: rgba(255, 255, 255, .6);
+        }
+
+        #ovReportsCard .progressGrid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+            margin-top: 12px;
+        }
+
+        #ovReportsCard .progressCard {
+            border: 1px solid var(--line);
+            background: #fff;
+            border-radius: 18px;
+            padding: 12px;
+        }
+
+        #ovReportsCard .progressHead {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 12px;
+        }
+
+        #ovReportsCard .progressHead .left {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        #ovReportsCard .progressHead .title {
+            font-weight: 900;
+            font-size: 14px;
+        }
+
+        #ovReportsCard .progressHead .meta {
+            color: var(--muted);
+            font-size: 12px;
+        }
+
+        #ovReportsCard .bar {
+            height: 12px;
+            background: rgba(0, 0, 0, .06);
+            border-radius: 999px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+
+        #ovReportsCard .bar>i {
+            display: block;
+            height: 100%;
+            width: 0%;
+            background: rgba(0, 0, 0, .78);
+        }
+
+        #ovReportsCard .barMeta {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            margin-top: 8px;
+            color: var(--muted);
+            font-size: 12px;
+        }
+
+        #ovReportsCard .barMeta b {
+            color: #111;
+        }
+
+        #ovReportsCard .ratioBadge {
+            font-weight: 950;
+            border: 1px solid var(--line);
+            border-radius: 999px;
+            padding: 6px 10px;
+            background: rgba(0, 0, 0, .03);
+            white-space: nowrap;
+        }
+
+        @media (min-width: 980px) {
+            #ovReportsCard .cardsGrid {
+                grid-template-columns: repeat(4, minmax(0, 1fr));
+            }
+
+            #ovReportsCard .progressGrid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+
+        /* ===== Soft Grey Stats Background (v18) ===== */
+        #ovReportsCard .statBox,
+        #ovReportsCard .progressCard {
+            background: #f7f7f7;
+        }
+
+
+        /* ===== Insights UI (v19) ===== */
+        #ovReportsCard .insightsGrid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+            margin-top: 12px;
+        }
+
+        #ovReportsCard .insightCard {
+            border: 1px solid var(--line);
+            background: #f7f7f7;
+            border-radius: 18px;
+            padding: 12px;
+        }
+
+        #ovReportsCard .insightTitle {
+            font-weight: 950;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        #ovReportsCard .insightSub {
+            color: var(--muted);
+            font-size: 12px;
+            margin-top: 6px;
+        }
+
+        #ovReportsCard .badgesRow {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 10px;
+            margin-top: 12px;
+        }
+
+        #ovReportsCard .badge {
+            border: 1px solid var(--line);
+            border-radius: 16px;
+            padding: 10px;
+            background: #fff;
+        }
+
+        #ovReportsCard .badge .rank {
+            font-weight: 950;
+            font-size: 12px;
+            color: #111;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        #ovReportsCard .badge .rank i {
+            width: 10px;
+            height: 10px;
+            border-radius: 999px;
+            background: rgba(0, 0, 0, .65);
+            display: inline-block;
+        }
+
+        #ovReportsCard .badge .name {
+            font-weight: 950;
+            margin-top: 8px;
+            font-size: 14px;
+        }
+
+        #ovReportsCard .badge .meta {
+            margin-top: 6px;
+            color: var(--muted);
+            font-size: 12px;
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        #ovReportsCard .miniTable {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 12px;
+            background: #fff;
+            border: 1px solid var(--line);
+            border-radius: 16px;
+            overflow: hidden;
+        }
+
+        #ovReportsCard .miniTable th,
+        #ovReportsCard .miniTable td {
+            padding: 10px;
+            border-bottom: 1px solid rgba(0, 0, 0, .06);
+            font-size: 12.5px;
+            text-align: right;
+        }
+
+        #ovReportsCard .miniTable th {
+            background: rgba(0, 0, 0, .03);
+            font-weight: 900;
+        }
+
+        #ovReportsCard .miniTable tr:last-child td {
+            border-bottom: none;
+        }
+
+        #ovReportsCard .spark {
+            height: 10px;
+            background: rgba(0, 0, 0, .06);
+            border-radius: 999px;
+            overflow: hidden;
+        }
+
+        #ovReportsCard .spark>i {
+            display: block;
+            height: 100%;
+            width: 0%;
+            background: rgba(0, 0, 0, .78);
+        }
+
+        #ovReportsCard .avgRow {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 10px;
+            margin-top: 12px;
+        }
+
+        #ovReportsCard .avgBox {
+            border: 1px solid var(--line);
+            border-radius: 16px;
+            padding: 10px;
+            background: #fff;
+        }
+
+        #ovReportsCard .avgBox .k {
+            color: var(--muted);
+            font-size: 12px;
+        }
+
+        #ovReportsCard .avgBox .v {
+            font-weight: 950;
+            font-size: 16px;
+            margin-top: 6px;
+        }
+
+        @media (min-width: 980px) {
+            #ovReportsCard .insightsGrid {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            #ovReportsCard .avgRow {
+                grid-template-columns: repeat(4, minmax(0, 1fr));
+            }
+        }
+
+
+        /* ===== Align Insights with Report Design (v20) ===== */
+        #ovReportsCard .insightCard {
+            border: 1px solid var(--line);
+            background: #f7f7f7;
+            border-radius: 18px;
+            padding: 12px;
+        }
+
+        #ovReportsCard .insightTitle {
+            font-weight: 950;
+            font-size: 13px;
+            color: #111;
+        }
+
+        #ovReportsCard .insightSub {
+            margin-top: 6px;
+        }
+
+        #ovReportsCard .badge,
+        #ovReportsCard .avgBox {
+            background: #f7f7f7;
+        }
+
+
+        /* ===== Make Insights Match Stat Boxes (v21) ===== */
+        #ovReportsCard .insightsGrid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 12px;
+            margin-top: 12px;
+        }
+
+        @media (min-width: 980px) {
+            #ovReportsCard .insightsGrid {
+                grid-template-columns: repeat(4, minmax(0, 1fr));
+            }
+        }
+
+        #ovReportsCard .insightsGrid .statBox {
+            height: 100%;
+        }
+
+        #ovReportsCard .insightsGrid .fullRow {
+            grid-column: 1 / -1;
+        }
+    </style>
+</head>
+
+<body>
+    <header class="topbar">
+        <div class="topbar-inner">
+            <div class="brand">
+                <div class="logo">S</div>
+                <div>
+                    <h1>SIMT — Project Suite</h1>
+                    <p>نظام إدارة مشاريع • مشاريع متعددة</p>
+                </div>
+            </div>
+
+            <nav class="tabs" aria-label="Navigation">
+                <button class="tab active" data-view="kiosk">واجهة الموظف</button>
+                <button class="tab" data-view="overview">Overview</button>
+                <button class="tab" data-view="inbox">Inbox</button>
+                <button class="tab" data-view="tasks">Tasks</button>
+                <button class="tab" data-view="hours">Hours</button>
+
+                <button type="button" class="tab" data-view="payments">
+                    <span class="dot"></span>
+                    <span>Payments</span>
+                </button>
+
+                <button type="button" class="tab" data-view="settings">
+                    <span class="dot"></span>
+                    <span>Settings</span>
+                </button>
+
+
+            </nav>
+
+            <div class="tools">
+                <select id="projectSelect" style="min-width:260px;"></select>
+                <span class="pill"><span>الوقت</span> <span class="mono" id="now">—</span></span>
+                <button class="btn" id="btnSeed" type="button">Reset Demo</button>
+                <button class="btn info" id="btnExport" type="button">Export JSON</button>
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+        <!-- ====== KIOSK ====== -->
+        <section class="view" id="view-kiosk">
+            <div class="grid">
+                <div class="card span-12">
+                    <h2>واجهة الموظف (Kiosk) — تسجيل وقت + محادثات</h2>
+                    <div class="sub">الموظف يشوف فقط المهام المسندة له داخل المشروع المختار</div>
+                </div>
+
+                <div class="card span-12">
+                    <div class="kiosk-grid">
+                        <!-- Form -->
+                        <div class="card" style="box-shadow:none;">
+                            <h3>تسجيل دخول/خروج</h3>
+                            <div class="note">تجريبيًا: الصفحة تفتح تلقائيًا على <span class="badge info">E-3001</span>.
+                            </div>
+                            <div class="sep"></div>
+
+                            <div class="grid">
+                                <div class="span-6">
+                                    <div class="note" style="margin-bottom:6px;">Employee ID</div>
+                                    <input id="k_empId" placeholder="مثال: E-3001" />
+                                </div>
+                                <div class="span-6" style="display:flex; align-items:flex-end;">
+                                    <button class="btn info" id="k_btnSearch" type="button"
+                                        style="width:100%;">بحث</button>
+                                </div>
+
+                                <div class="span-12">
+                                    <div class="note" style="margin-bottom:6px;">الموظف</div>
+                                    <input id="k_empName" disabled placeholder="—" />
+                                </div>
+
+                                <div class="span-12">
+                                    <div class="note" style="margin-bottom:6px;">المهمة (المسندة لك فقط)</div>
+                                    <select id="k_taskSelect" disabled></select>
+                                </div>
+
+                                <div class="span-6">
+                                    <div class="note" style="margin-bottom:6px;">حالة المهمة عند الإجراء</div>
+                                    <select id="k_statusSelect" disabled>
+                                        <option value="Not Started">Not Started</option>
+                                        <option value="In Progress" selected>In Progress</option>
+                                        <option value="Blocked">Blocked</option>
+                                        <option value="Done">Done</option>
+                                    </select>
+                                </div>
+                                <div class="span-6">
+                                    <div class="note" style="margin-bottom:6px;">ملاحظة (اختياري)</div>
+                                    <input id="k_notes" disabled placeholder="مثال: تعديل UI / انتظار API..." />
+                                </div>
+
+                                <div class="span-6">
+                                    <button class="btn primary" id="k_btnIn" type="button" disabled
+                                        style="width:100%;">IN (بدء)</button>
+                                </div>
+                                <div class="span-6">
+                                    <button class="btn danger" id="k_btnOut" type="button" disabled
+                                        style="width:100%;">OUT (إنهاء)</button>
+                                </div>
+
+                                <!-- Mobile sticky -->
+                                <div class="span-12 mobile-actions" aria-label="Mobile actions">
+                                    <button class="btn primary" id="k_btnIn2" type="button" disabled>IN (بدء)</button>
+                                    <button class="btn danger" id="k_btnOut2" type="button" disabled>OUT
+                                        (إنهاء)</button>
+                                </div>
+
+                                <div class="span-12">
+                                    <div class="note">
+                                        <strong>منطق الدفع:</strong> عند OUT يتم حساب الساعات ويُضبط Pay تلقائيًا إلى
+                                        <span class="badge warn">Unpaid</span>.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Summary + Chat + History -->
+                        <div class="card" style="box-shadow:none;">
+                            <h3>ملخص الموظف</h3>
+                            <div class="sub">ساعاتك + سجلك + محادثة المهمة</div>
+
+                            <div class="kpis" style="grid-template-columns: repeat(3, 1fr);">
+                                <div class="kpi">
+                                    <div class="label">إجمالي ساعات المشروع</div>
+                                    <div class="value"><span id="k_kpiHours">—</span> <span class="badge">Hours</span>
+                                    </div>
+                                </div>
+                                <div class="kpi">
+                                    <div class="label">جلسات مفتوحة</div>
+                                    <div class="value"><span id="k_kpiOpen">—</span> <span
+                                            class="badge warn">Open</span></div>
+                                </div>
+                                <div class="kpi">
+                                    <div class="label">Unpaid Hours</div>
+                                    <div class="value"><span id="k_kpiUnpaid">—</span> <span
+                                            class="badge warn">Unpaid</span></div>
+                                </div>
+                            </div>
+
+                            <div class="sep"></div>
+
+                            <h3 style="margin-bottom:8px;">آخر 10 سجلات</h3>
+                            <div class="table-wrap">
+                                <table style="min-width: 760px;">
+                                    <thead>
+                                        <tr>
+                                            <th>الوقت</th>
+                                            <th>Task</th>
+                                            <th>Action</th>
+                                            <th>Status</th>
+                                            <th>Notes</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="k_tblHistory">
+                                        <tr>
+                                            <td colspan="5" class="note">—</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div class="sep"></div>
+
+                            <h3 style="margin-bottom:8px;">محادثة المهمة</h3>
+                            <div class="chat" style="min-height: 360px;">
+                                <div class="chat-head">
+                                    <div class="t">
+                                        <strong id="k_chatTitle">—</strong>
+                                        <span id="k_chatMeta">اختر مهمة لعرض المحادثة</span>
+                                    </div>
+                                    <span class="badge info">Employee</span>
+                                </div>
+                                <div class="chat-body" id="k_chatBody">
+                                    <div class="note">—</div>
+                                </div>
+                                <div class="chat-foot" style="grid-template-columns: 1fr 140px;">
+                                    <textarea id="k_chatInput" placeholder="اكتب رسالة تخص هذه المهمة..."
+                                        disabled></textarea>
+                                    <button class="btn info" id="k_chatSend" type="button" disabled>إرسال</button>
+                                </div>
+                            </div>
+
+                            <div class="sep"></div>
+                            <div class="note">ملاحظة: هذه نسخة Demo محلية. لاحقًا نربطها بـ API + صلاحيات.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ====== OVERVIEW ====== -->
+        <section class="view hidden" id="view-overview">
+
+            <div class="card" id="ovReportsCard" style="margin-top:14px;">
+                <div class="head">
+                    <div>
+                        <div class="title">تقارير وملخصات المشاريع</div>
+                        <div class="sub">اختر مشروعًا لعرض إحصائيات شاملة وتصدير تقرير.</div>
+                    </div>
+                    <span class="pill">Reports</span>
+                </div>
+
+                <div class="exportRow">
+                    <div class="field">
+                        <label>اختر المشروع</label>
+                        <select id="ovProjectSelect"></select>
+                    </div>
+                    <button type="button" class="btn" id="btnExportProjectReport">Export Project Report</button>
+                </div>
+
+                <div class="cardsGrid" id="ovProjectStats"></div>
+
+                <div class="progressGrid">
+                    <div class="progressCard">
+                        <div class="progressHead">
+                            <div class="left">
+                                <div class="title">استهلاك الميزانية</div>
+                                <div class="meta" id="ovBudgetLeft">—</div>
+                            </div>
+                            <div class="ratioBadge" id="ovBudgetPct">—</div>
+                        </div>
+                        <div class="bar"><i id="ovBudgetBar"></i></div>
+                        <div class="barMeta"><span>الميزانية</span><b id="ovBudgetRight">—</b></div>
+                    </div>
+
+                    <div class="progressCard">
+                        <div class="progressHead">
+                            <div class="left">
+                                <div class="title">نسبة الدفع</div>
+                                <div class="meta" id="ovPayLeft">—</div>
+                            </div>
+                            <div class="ratioBadge" id="ovPayPct">—</div>
+                        </div>
+                        <div class="bar"><i id="ovPayBar"></i></div>
+                        <div class="barMeta"><span>المدفوع / الإجمالي</span><b id="ovPayRight">—</b></div>
+                    </div>
+                </div>
+                <div class="barMeta"><span id="ovBudgetLeft">—</span><span id="ovBudgetRight">—</span></div>
+            </div>
+            <div class="insightsGrid" id="ovInsights"></div>
+            <div class="mutedTiny" id="ovProjectHints" style="margin-top:10px;"></div>
+            </div>
+
+            <div class="grid">
+                <div class="card span-12">
+                    <h2>Overview</h2>
+                    <div class="sub">ملخص سريع للمشروع المختار</div>
+                    <div class="kpis">
+                        <div class="kpi">
+                            <div class="label">Total Hours</div>
+                            <div class="value"><span id="kpiHours">—</span> <span class="badge">Hours</span></div>
+                        </div>
+                        <div class="kpi">
+                            <div class="label">Open Sessions</div>
+                            <div class="value"><span id="kpiOpen">—</span> <span class="badge warn">Open</span></div>
+                        </div>
+                        <div class="kpi">
+                            <div class="label">Unpaid Hours</div>
+                            <div class="value"><span id="kpiUnpaid">—</span> <span class="badge warn">Unpaid</span>
+                            </div>
+                        </div>
+                        <div class="kpi">
+                            <div class="label">Blocked Tasks</div>
+                            <div class="value"><span id="kpiBlocked">—</span> <span class="badge bad">Blocked</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card span-7">
+                    <h3>Tasks by Status</h3>
+                    <div class="sub">Not Started / In Progress / Blocked / Done</div>
+                    <div class="table-wrap">
+                        <table style="min-width: 760px;">
+                            <thead>
+                                <tr>
+                                    <th>Task</th>
+                                    <th class="mono">Task_ID</th>
+                                    <th>Assignee</th>
+                                    <th>Status</th>
+                                    <th>Priority</th>
+                                    <th>Due</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tblOverviewTasks"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="card span-5">
+                    <h3>Quick Feed</h3>
+                    <div class="sub">آخر رسالة + آخر جلسة منتهية</div>
+                    <div class="sep"></div>
+                    <div id="quickFeed" class="note">—</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ====== INBOX ====== -->
+        <section class="view hidden" id="view-inbox">
+            <div class="card span-12">
+                <h2>Inbox</h2>
+                <div class="sub">محادثات مرتبطة بـ Project + Task (رد + تحديث حالة)</div>
+
+                <div class="inbox">
+                    <div class="list">
+                        <div class="list-head">
+                            <select id="filterStatus"></select>
+                            <select id="filterAssignee"></select>
+                            <input id="filterSearch" placeholder="بحث باسم المهمة أو ID..." />
+                        </div>
+                        <div class="list-body" id="inboxList"></div>
+                    </div>
+
+                    <div class="chat">
+                        <div class="chat-head">
+                            <div class="t">
+                                <strong id="chatTitle">—</strong>
+                                <span id="chatMeta">اختر مهمة لعرض المحادثة</span>
+                            </div>
+                            <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
+                                <select id="chatRole">
+                                    <option value="Leader" selected>Leader</option>
+                                    <option value="Manager">Manager</option>
+                                </select>
+                                <select id="chatStatus"></select>
+                                <button class="btn primary" id="btnUpdateStatus" type="button">تحديث الحالة</button>
+                            </div>
+                        </div>
+
+                        <div class="chat-body" id="chatBody">
+                            <div class="note">—</div>
+                        </div>
+
+                        <div class="chat-foot">
+                            <textarea id="chatInput" placeholder="اكتب ردًا..." disabled></textarea>
+                            <button class="btn info" id="chatSend" type="button" disabled>إرسال</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ====== TASKS ====== -->
+        <section class="view hidden" id="view-tasks">
+            <div class="grid">
+                <div class="card span-8">
+                    <h2>Tasks</h2>
+                    <div class="sub">قائمة المهام + إجمالي ساعات لكل مهمة</div>
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Task</th>
+                                    <th class="mono">Task_ID</th>
+                                    <th>Assignee</th>
+                                    <th>Status</th>
+                                    <th>Priority</th>
+                                    <th>Start</th>
+                                    <th>Due</th>
+                                    <th>Hours</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tblTasks"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="card span-4">
+                    <h2>Quick Edit</h2>
+                    <div class="sub">تعديل حالة/أولوية/مواعيد/ملاحظات</div>
+
+                    <div style="display:grid; gap:12px;">
+                        <select id="taskPick"></select>
+
+                        <div style="display:grid; gap:10px; grid-template-columns: 1fr 1fr;">
+                            <select id="taskSetStatus"></select>
+                            <select id="taskSetPriority"></select>
+                        </div>
+
+                        <select id="taskSetAssignee"></select>
+
+                        <div style="display:grid; gap:10px; grid-template-columns: 1fr 1fr;">
+                            <input id="taskSetStart" type="date" />
+                            <input id="taskSetDue" type="date" />
+                        </div>
+
+                        <textarea id="taskSetNotes" placeholder="ملاحظات المدير/الليدر..."></textarea>
+                        <button class="btn primary" id="btnSaveTask" type="button">حفظ</button>
+
+                        <div class="note">أي تعديل هنا ينعكس مباشرة على واجهة الموظف (نفس التخزين).</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ====== HOURS ====== -->
+        <section class="view hidden" id="view-hours">
+            <div class="grid">
+                <div class="card span-12">
+                    <h2>Hours</h2>
+                    <div class="sub">فلترة + اعتماد جلسات قبل الدفع</div>
+
+                    <div style="display:grid; gap:12px; grid-template-columns: 1fr 1fr 1fr 1fr;">
+                        <select id="hoursEmp"></select>
+                        <select id="hoursPay">
+                            <option value="all">كل الحالات</option>
+                            <option value="Open">Open</option>
+                            <option value="Unpaid">Unpaid</option>
+                            <option value="Paid">Paid</option>
+                            <option value="Approved">Approved</option>
+                        </select>
+                        <input id="hoursFrom" type="date" />
+                        <input id="hoursTo" type="date" />
+                    </div>
+
+                    <div class="sep"></div>
+
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Employee</th>
+                                    <th class="mono">Emp_ID</th>
+                                    <th>Task</th>
+                                    <th class="mono">Task_ID</th>
+                                    <th>Start</th>
+                                    <th>End</th>
+                                    <th>Hours</th>
+                                    <th>End Status</th>
+                                    <th>Pay</th>
+                                    <th>Approve</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tblSessions"></tbody>
+                        </table>
+                    </div>
+
+                    <div class="sep"></div>
+                    <div class="note">المنطق المقترح: Approve → ثم Payments (Payment_ID) يربط عدة جلسات.</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- =========================
+           Payments
+      ========================== -->
+        <section class="panel hidden" id="view-payments">
+            <div class="grid grid-2">
+                <!-- Create Payment -->
+                <div class="card">
+                    <div class="head">
+                        <div>
+                            <div class="title">Create Payment</div>
+                            <div class="sub">اجمع المتبقي (Unpaid) للموظف بضغطة واحدة.</div>
+                        </div>
+                        <span class="pill">Manager</span>
+                    </div>
+
+                    <div class="form">
+                        <div class="row">
+                            <div class="field">
+                                <label>Employee</label>
+                                <select id="payEmp">
+                                    <option>—</option>
+                                </select>
+                            </div>
+                            <div class="field">
+                                <label>Transfer Date</label>
+                                <input id="payDate" type="date" />
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="field">
+                                <label>Method</label>
+                                <select id="payMethod">
+                                    <option value="Bank Transfer">Bank Transfer</option>
+                                    <option value="STC Pay">STC Pay</option>
+                                    <option value="Mada">Mada</option>
+                                    <option value="Cash">Cash</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+                            <div class="field">
+                                <label>Receipt (optional)</label>
+                                <input id="payReceipt" type="file" accept="image/*,application/pdf" />
+                                <div class="hint" id="payReceiptHint">Demo: سيتم حفظ اسم الملف فقط.</div>
+                            </div>
+                        </div>
+
+                        <div class="field">
+                            <label>Notes (optional)</label>
+                            <textarea id="payNotes"
+                                placeholder="ملاحظات التحويل، رقم العملية، أو أي تفاصيل..."></textarea>
+                        </div>
+
+                        <div class="card soft" style="padding:12px;">
+                            <div
+                                style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap;">
+                                <div>
+                                    <div class="sub">Remaining Unpaid (Ended)</div>
+                                    <div style="font-weight:900;font-size:26px;margin-top:4px;"><span
+                                            id="payRemainHours">0.00</span>h</div>
+                                    <div class="hint" id="payRemainMeta">—</div>
+                                </div>
+                                <button type="button" class="btn" id="btnPayCollect">Pay Remaining</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Payments list -->
+                <div class="card">
+                    <div class="head">
+                        <div>
+                            <div class="title">Payments</div>
+                            <div class="sub">سجل الدفعات + التصدير.</div>
+                        </div>
+                        <span class="pill" id="payCount">0</span>
+                    </div>
+
+                    <div class="list" id="payList">
+                        <div class="hint">Loading…</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- =========================
+           Settings
+      ========================== -->
+
+
+
+
+
+
+        <section class="panel hidden" id="view-settings">
+            <div class="settingsWrap settingsWrapDrawer">
+                <!-- LEFT: Tabs -->
+                <aside class="card settingsNav">
+                    <div class="head">
+                        <div>
+                            <div class="title">الإعدادات</div>
+                            <div class="sub">إدارة المشاريع، الموظفين، الحالات، الأولوية، وإعدادات عامة.</div>
+                        </div>
+                        <span class="pill">Admin</span>
+                    </div>
+
+                    <div class="list" id="settingsNav">
+                        <button type="button" class="snav active" data-sview="projects">المشاريع</button>
+                        <button type="button" class="snav" data-sview="employees">الموظفين</button>
+                        <button type="button" class="snav" data-sview="statuses">الحالات</button>
+                        <button type="button" class="snav" data-sview="priorities">الأولوية</button>
+                        <button type="button" class="snav" data-sview="jobtitles">المسمى الوظيفي</button>
+                        <button type="button" class="snav" data-sview="general">إعدادات عامة</button>
+                    </div>
+                </aside>
+
+                <!-- RIGHT: Content -->
+                <section class="card settingsBody settingsBodyDrawer">
+                    <div id="settingsListCard"></div>
+
+                    <!-- Drawer -->
+                    <div class="sDrawer" id="sDrawer" aria-hidden="true">
+                        <div class="sDrawerBackdrop" id="sDrawerBackdrop"></div>
+                        <div class="sDrawerPanel" role="dialog" aria-modal="true" aria-label="Settings editor">
+                            <div class="sDrawerHead">
+                                <div>
+                                    <div class="title" id="sDrawerTitle">تحرير</div>
+                                    <div class="sub" id="sDrawerSub">—</div>
+                                </div>
+                                <button type="button" class="btn" id="btnCloseDrawer">إغلاق</button>
+                            </div>
+                            <div class="sDrawerBody" id="settingsDetailCard"></div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </section>
+
+        </div>
+        </section>
+
+        </div>
+        </section>
+
+
+
+
+
+
+    </main>
+
+    <div class="toast hidden" id="toast">
+        <div>
+            <strong id="toastTitle">تم</strong>
+            <p id="toastMsg">—</p>
+        </div>
+        <button class="btn" id="toastClose" type="button">إغلاق</button>
+    </div>
+
+    <script>
+        /* =============================
+           Google Sheets (Apps Script) API
+           - ضع رابط Web App في API_URL
+           - ضع نفس apiToken الموجود في Sheet > Config داخل API_TOKEN
+           ============================= */
+        const API_URL = 'https://script.google.com/macros/s/AKfycby06uPQ2q5cwklEs9jCZZ9KmLq9-PVrV1mPgVgQ2NC4mS1v68MVNjNHhbLi_mdcVlL9/exec';
+        const API_TOKEN = 'SIMT-12345';
+
+
+        async function apiGet(params) {
+            if (!API_URL) throw new Error("API_URL_NOT_SET");
+            const url = API_URL + "?" + new URLSearchParams({ token: API_TOKEN, ...params }).toString();
+            const r = await fetch(url, { method: "GET" });
+            return await r.json();
+        }
+        async function apiPost(body) {
+            if (!API_URL) throw new Error("API_URL_NOT_SET");
+            const r = await fetch(API_URL, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ token: API_TOKEN, ...body })
+            });
+            return await r.json();
+        }
+
+        /* تحميل البيانات من Google Sheets (بدل الديمو) */
+        async function loadFromSheets() {
+            const res = await apiGet({ action: "bootstrap" });
+            if (!res || !res.ok) throw new Error(res && res.error ? res.error : "BOOTSTRAP_FAILED");
+
+            // دعم أسماء مختلفة حسب ما يرجع من Apps Script
+            const cfg = res.config || {};
+            state.config = state.config || {};
+            state.config.general = {
+                systemName: cfg.systemName || (state.config.general && state.config.general.systemName) || "Simt App",
+                timezone: cfg.timezone || (state.config.general && state.config.general.timezone) || "Asia/Riyadh",
+                fxSarPerUsd: Number(cfg.fxSarPerUsd || (state.config.general && state.config.general.fxSarPerUsd) || 3.75),
+            };
+
+            // Normalize arrays
+            state.employees = (res.employees || []).map(e => ({
+                id: String(e.id || "").trim(),
+                name: e.name || e.fullName || e.id,
+                role: e.role || "",
+                rate: Number(e.rateUsd || e.rate || 0),
+                pin: String(e.pin || ""),
+                active: String(e.active).toUpperCase() !== "FALSE"
+            }));
+
+            state.projects = (res.projects || []).map(p => ({
+                id: String(p.id || "").trim(),
+                name: p.name || p.id,
+                createdAt: p.createdAt || p.created_at || "",
+                budget: Number(p.budgetUsd || p.budget || 0),
+                active: String(p.active).toUpperCase() !== "FALSE"
+            }));
+
+            state.tasks = (res.tasks || []).map(t => ({
+                id: String(t.id || "").trim(),
+                projectId: String(t.projectId || t.project || t.project_id || "").trim(),
+                title: t.title || t.name || t.id,
+                status: t.status || "Todo",
+                priority: t.priority || "Medium",
+                assignee: String(t.assigneeId || t.assignee || t.employeeId || "").trim(),
+                createdAt: t.createdAt || t.created_at || "",
+                hidden: String(t.hidden).toUpperCase() === "TRUE"
+            })).filter(t => !t.hidden);
+
+            state.timeEntries = (res.timeEntries || res.tracking || []).map(x => ({
+                id: x.id || "",
+                employeeId: x.employeeId || x.employee || x.empId || "",
+                taskId: x.taskId || x.task || x.task_id || "",
+                action: (x.action || "").toUpperCase(),
+                ts: x.ts || x.time || x.createdAt || "",
+                note: x.note || ""
+            }));
+
+            state.payments = (res.payments || []).map(p => ({
+                id: p.id || "",
+                projectId: p.projectId || p.project || p.project_id || "",
+                employeeId: p.employeeId || p.employee || "",
+                amount: Number(p.amountUsd || p.amount || 0),
+                hours: Number(p.hours || 0),
+                transferDate: p.transferDate || p.date || "",
+                method: p.method || "",
+                receiptUrl: p.receiptUrl || "",
+                notes: p.notes || ""
+            }));
+
+            state.comments = (res.comments || []).map(c => ({
+                id: c.id || "",
+                taskId: c.taskId || c.task || "",
+                authorId: c.authorId || c.author || "",
+                ts: c.ts || c.date || "",
+                message: c.message || ""
+            }));
+
+            // تحديث الواجهة
+            hydrateAll();
+        }
+
+        /* محاولة تحميل Sheets تلقائياً — إذا فشل نرجع للديمو */
+        (async function autoLoad() {
+            try {
+                if (API_URL) {
+                    await loadFromSheets();
+                    toast("Connected", "تم الربط مع Google Sheets بنجاح");
+                }
+            } catch (e) {
+                // يبقى الديمو شغال
+                console.warn("Sheets load skipped/failed:", e);
+            }
+        })();
+
+
+
+        /* =========================
+           Shared Store (LocalStorage)
+           ========================= */
+        const STORE_KEY = "SIMT_SUITE_STATE_v1";
+
+        const seed = () => ({
+            projects: [
+                { id: "PRJ-001", name: "Simt SaaS Core", status: "Active", start: "2026-01-05", due: "2026-03-01" },
+                { id: "PRJ-002", name: "Simt Kiosk Web", status: "Active", start: "2026-02-01", due: "2026-02-20" },
+                { id: "PRJ-003", name: "Simt Marketing Site", status: "On Hold", start: "2026-01-20", due: "2026-02-25" },
+            ],
+            employees: [
+                { id: "E-1001", name: "Anas (Manager)", role: "Manager" },
+                { id: "E-2001", name: "Aya (Leader)", role: "Leader" },
+                { id: "E-3001", name: "John (Front-end)", role: "Front-end" },
+                { id: "E-4001", name: "Hatem (Back-end)", role: "Back-end" },
+            ],
+            tasks: [
+                // PRJ-001
+                { projectId: "PRJ-001", id: "TASK-001", name: "Auth + Roles", assignee: "Hatem (Back-end)", empId: "E-4001", status: "In Progress", priority: "High", start: "2026-02-02", due: "2026-02-15", notes: "" },
+                { projectId: "PRJ-001", id: "TASK-002", name: "Admin Dashboard Shell", assignee: "John (Front-end)", empId: "E-3001", status: "Not Started", priority: "Medium", start: "2026-02-08", due: "2026-02-22", notes: "" },
+                { projectId: "PRJ-001", id: "TASK-003", name: "Data Model (Projects/Tasks/Sessions)", assignee: "Aya (Leader)", empId: "E-2001", status: "In Progress", priority: "Medium", start: "2026-02-03", due: "2026-02-10", notes: "" },
+
+                // PRJ-002
+                { projectId: "PRJ-002", id: "TASK-010", name: "Employee Kiosk (Mobile UX)", assignee: "John (Front-end)", empId: "E-3001", status: "In Progress", priority: "High", start: "2026-02-06", due: "2026-02-12", notes: "" },
+                { projectId: "PRJ-002", id: "TASK-011", name: "Kiosk API Endpoints", assignee: "Hatem (Back-end)", empId: "E-4001", status: "In Progress", priority: "High", start: "2026-02-06", due: "2026-02-14", notes: "" },
+                { projectId: "PRJ-002", id: "TASK-012", name: "Task Chat (Thread per Task)", assignee: "Aya (Leader)", empId: "E-2001", status: "Done", priority: "Medium", start: "2026-02-05", due: "2026-02-07", notes: "مستند سلوك المحادثات" },
+
+                // PRJ-003
+                { projectId: "PRJ-003", id: "TASK-020", name: "Landing (Light Theme)", assignee: "John (Front-end)", empId: "E-3001", status: "Blocked", priority: "Medium", start: "2026-02-01", due: "2026-02-10", notes: "بسبب تغيير المحتوى" },
+                { projectId: "PRJ-003", id: "TASK-021", name: "Content Plan", assignee: "Anas (Manager)", empId: "E-1001", status: "In Progress", priority: "Low", start: "2026-02-01", due: "2026-02-25", notes: "" },
+            ],
+            payments: [
+                { id: "PAY-0000", empId: "E-3001", date: "2026-02-05", method: "Bank Transfer", receiptName: "receipt_demo.pdf", notes: "دفعة تجريبية — تحويل بنكي", hours: 4.00, sessionIds: [1, 2] }
+            ],
+            sessions: [
+                {
+                    id: 1, projectId: "PRJ-002", empId: "E-3001", emp: "John (Front-end)", taskId: "TASK-010", task: "Employee Kiosk (Mobile UX)",
+                    start: "2026-02-07T09:10:00", end: "2026-02-07T11:20:00", hours: 2.17, endStatus: "In Progress", pay: "Unpaid", approved: false
+                },
+                {
+                    id: 2, projectId: "PRJ-002", empId: "E-3001", emp: "John (Front-end)", taskId: "TASK-010", task: "Employee Kiosk (Mobile UX)",
+                    start: "2026-02-07T12:05:00", end: "2026-02-07T13:10:00", hours: 1.08, endStatus: "In Progress", pay: "Unpaid", approved: false
+                },
+                {
+                    id: 3, projectId: "PRJ-001", empId: "E-4001", emp: "Hatem (Back-end)", taskId: "TASK-001", task: "Auth + Roles",
+                    start: "2026-02-07T10:00:00", end: null, hours: null, endStatus: "", pay: "Open", approved: false
+                },
+                {
+                    id: 4, projectId: "PRJ-003", empId: "E-3001", emp: "John (Front-end)", taskId: "TASK-020", task: "Landing (Light Theme)",
+                    start: "2026-02-03T10:10:00", end: "2026-02-03T12:40:00", hours: 2.50, endStatus: "Blocked", pay: "Paid", approved: true
+                },
+            ],
+            chats: {
+                "PRJ-002|TASK-010": [
+                    { id: 1, ts: "2026-02-07T10:25:00", by: "John (Front-end)", role: "Employee", text: "ثبتت شريط أزرار IN/OUT للجوال. تحتاج تغيير نصوص؟" },
+                    { id: 2, ts: "2026-02-07T10:32:00", by: "Aya (Leader)", role: "Leader", text: "ممتاز. خل الأزرار أكبر 44px وقلل حشو الهيدر." },
+                    { id: 3, ts: "2026-02-07T11:05:00", by: "Anas (Manager)", role: "Manager", text: "ركز على بساطة الحقول: بحث → اختيار مهمة → IN/OUT فقط." }
+                ],
+                "PRJ-001|TASK-001": [
+                    { id: 1, ts: "2026-02-07T10:45:00", by: "Hatem (Back-end)", role: "Employee", text: "جهزت Roles: Admin / Leader / Employee. باقي Kiosk PIN." },
+                    { id: 2, ts: "2026-02-07T11:00:00", by: "Aya (Leader)", role: "Leader", text: "تمام. نحتاج Policy: الموظف يشوف مهامه فقط." }
+                ],
+                "PRJ-003|TASK-020": [
+                    { id: 1, ts: "2026-02-06T09:30:00", by: "John (Front-end)", role: "Employee", text: "Landing جاهزة Light. باقي المحتوى النهائي." },
+                    { id: 2, ts: "2026-02-06T09:40:00", by: "Anas (Manager)", role: "Manager", text: "أوقفها مؤقتًا لين يجهز المحتوى. ضع الحالة Blocked." }
+                ]
+            },
+            log: [
+                { id: 1, ts: "2026-02-07T09:10:00", projectId: "PRJ-002", empId: "E-3001", taskId: "TASK-010", task: "Employee Kiosk (Mobile UX)", action: "IN", status: "In Progress", notes: "" },
+                { id: 2, ts: "2026-02-07T11:20:00", projectId: "PRJ-002", empId: "E-3001", taskId: "TASK-010", task: "Employee Kiosk (Mobile UX)", action: "OUT", status: "In Progress", notes: "إنهاء جزء من تحسين الجوال" },
+                { id: 3, ts: "2026-02-07T12:05:00", projectId: "PRJ-002", empId: "E-3001", taskId: "TASK-010", task: "Employee Kiosk (Mobile UX)", action: "IN", status: "In Progress", notes: "" },
+                { id: 4, ts: "2026-02-07T13:10:00", projectId: "PRJ-002", empId: "E-3001", taskId: "TASK-010", task: "Employee Kiosk (Mobile UX)", action: "OUT", status: "In Progress", notes: "تحسين أحجام الخطوط" },
+                { id: 5, ts: "2026-02-07T10:00:00", projectId: "PRJ-001", empId: "E-4001", taskId: "TASK-001", task: "Auth + Roles", action: "IN", status: "In Progress", notes: "" },
+            ]
+        });
+
+        let state = null;
+        let currentProjectId = "PRJ-002"; // kiosk-friendly default
+        let selectedInboxKey = null;
+        let k_currentEmp = null;
+
+        /* =========================
+           Utils
+           ========================= */
+        const $ = (s, r = document) => r.querySelector(s);
+        const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
+
+        const escapeHtml = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;" }[c]));
+        const fmt = (n) => (Number.isFinite(n) ? (Math.round(n * 100) / 100).toFixed(2) : "—");
+        const fmtDT = (iso) => {
+            if (!iso) return "—";
+            const d = new Date(iso);
+            if (isNaN(d.getTime())) return String(iso);
+            return d.toLocaleString('ar-SA', { hour12: true });
+        };
+
+        const toast = (title, msg) => {
+            $("#toastTitle").textContent = title;
+            $("#toastMsg").textContent = msg;
+            $("#toast").classList.remove("hidden");
+        };
+        $("#toastClose").addEventListener("click", () => $("#toast").classList.add("hidden"));
+
+        /* Clock */
+        setInterval(() => $("#now").textContent = new Date().toLocaleString('ar-SA', { hour12: true }), 500);
+
+        /* =========================
+           Storage
+           ========================= */
+        function loadState() {
+            try {
+                const raw = localStorage.getItem(STORE_KEY);
+                return raw ? JSON.parse(raw) : null;
+            } catch (e) { return null; }
+        }
+        function saveState() {
+            try { localStorage.setItem(STORE_KEY, JSON.stringify(state)); } catch (e) { }
+        }
+
+        function ensurePayments() { if (!state.payments) state.payments = []; }
+
+        function normalizeEmployees() {
+            (state.employees || []).forEach(e => {
+                if (e.hidden == null) e.hidden = false;
+                if (e.country == null) e.country = "Saudi Arabia";
+                if (e.city == null) e.city = "Riyadh";
+                if (e.address == null) e.address = "";
+                if (e.dob == null) e.dob = "";
+                if (e.nationalId == null) e.nationalId = "";
+                if (e.contractFile == null) e.contractFile = "";
+                if (e.ndaFile == null) e.ndaFile = "";
+            });
+        }
+
+        function ensureSettings() {
+            if (!state.config) state.config = {};
+            if (!state.config.statuses) state.config.statuses = ["Backlog", "In Progress", "Blocked", "Review", "Done"];
+            if (!state.config.priorities) state.config.priorities = ["Low", "Medium", "High", "Urgent"];
+            if (!state.config.general) state.config.general = { currency: "USD", fxSarPerUsd: 3.75, workdayHours: 8, timezone: "Asia/Riyadh", systemName: "Simt App", systemDesc: "لوحة لإدارة المشاريع والمهام والساعات والمدفوعات.", logoDataUrl: "" };
+        }
+
+
+        /* =========================
+           Tabs / Views
+           ========================= */
+        const viewIds = ["kiosk", "overview", "inbox", "tasks", "hours", "payments", "settings"];
+        function setView(v) {
+            viewIds.forEach(x => $("#view-" + x).classList.toggle("hidden", x !== v));
+            $$(".tab").forEach(b => b.classList.toggle("active", b.dataset.view === v));
+            // Render current view
+            hydrateAll();
+
+            if (v === "payments") renderPaymentsTab();
+            if (v === "settings") renderSettingsTab();
+        }
+        $$(".tab").forEach(b => b.addEventListener("click", () => setView(b.dataset.view)));
+
+        /* =========================
+           Projects
+           ========================= */
+        function fillProjectSelect() {
+            $("#projectSelect").innerHTML = state.projects.map(p => `<option value="${p.id}">[${p.id}] ${p.name} • ${p.status}</option>`).join("");
+            $("#projectSelect").value = currentProjectId;
+        }
+        $("#projectSelect").addEventListener("change", () => {
+            currentProjectId = $("#projectSelect").value;
+            selectedInboxKey = null;
+            hydrateAll();
+            saveState();
+            toast("تم", "تم تغيير المشروع.");
+        });
+
+        /* =========================
+           Derived helpers
+           ========================= */
+        const projectTasks = () => state.tasks.filter(t => t.projectId === currentProjectId);
+        const projectSessions = () => state.sessions.filter(s => s.projectId === currentProjectId);
+        const projectChatKeys = () => Object.keys(state.chats || {}).filter(k => k.startsWith(currentProjectId + "|"));
+        const statusDot = (status) => status === "Done" ? "good" : (status === "Blocked" ? "bad" : (status === "In Progress" ? "info" : ""));
+        const badgeClass = (status) => status === "Blocked" ? "bad" : (status === "Done" ? "good" : (status === "In Progress" ? "info" : ""));
+
+        /* =========================
+           Overview
+           ========================= */
+        function renderOverview() {
+            const sessions = projectSessions();
+            const ended = sessions.filter(s => s.end);
+            const open = sessions.filter(s => !s.end).length;
+            const totalHours = ended.reduce((a, s) => a + (s.hours || 0), 0);
+            const unpaidHours = ended.filter(s => s.pay === "Unpaid").reduce((a, s) => a + (s.hours || 0), 0);
+            const blockedTasks = projectTasks().filter(t => t.status === "Blocked").length;
+
+            $("#kpiHours").textContent = fmt(totalHours);
+            $("#kpiOpen").textContent = open;
+            $("#kpiUnpaid").textContent = fmt(unpaidHours);
+            $("#kpiBlocked").textContent = blockedTasks;
+
+            const rows = projectTasks().slice().sort((a, b) => a.due.localeCompare(b.due));
+            $("#tblOverviewTasks").innerHTML = rows.map(t => `
+    <tr>
+      <td><strong>${escapeHtml(t.name)}</strong></td>
+      <td class="mono">${t.id}</td>
+      <td>${escapeHtml(t.assignee)}</td>
+      <td><span class="badge ${badgeClass(t.status)}">${t.status}</span></td>
+      <td><span class="badge ${t.priority === "High" ? "warn" : (t.priority === "Medium" ? "info" : "")}">${t.priority}</span></td>
+      <td class="mono">${t.due}</td>
+    </tr>
+  `).join("") || `<tr><td colspan="6" class="note">لا توجد مهام.</td></tr>`;
+
+            // Quick feed
+            let lastMsg = null;
+            projectChatKeys().forEach(k => {
+                const thread = state.chats[k] || [];
+                const m = thread.slice().sort((a, b) => new Date(b.ts) - new Date(a.ts))[0];
+                if (m && (!lastMsg || new Date(m.ts) > new Date(lastMsg.ts))) lastMsg = { ...m, key: k };
+            });
+            const lastSession = ended.slice().sort((a, b) => new Date(b.end) - new Date(a.end))[0] || null;
+            const proj = state.projects.find(p => p.id === currentProjectId);
+
+            $("#quickFeed").innerHTML = `
+    <div><span class="badge">Project</span> <strong>${escapeHtml(proj.name)}</strong> <span class="mono">(${proj.id})</span></div>
+    <div class="sep"></div>
+    <div>
+      <div style="font-weight:900; margin-bottom:8px;">آخر رسالة</div>
+      ${lastMsg ? `
+        <div class="note"><span class="badge ${lastMsg.role === "Manager" ? "bad" : (lastMsg.role === "Leader" ? "good" : "info")}">${lastMsg.role}</span>
+        <strong>${escapeHtml(lastMsg.by)}</strong> • <span class="mono">${fmtDT(lastMsg.ts)}</span></div>
+        <div style="margin-top:8px; padding:12px; border:1px solid var(--border); border-radius:14px; background:#fff;">${escapeHtml(lastMsg.text)}</div>
+      ` : `<div class="note">لا توجد رسائل.</div>`}
+    </div>
+    <div class="sep"></div>
+    <div>
+      <div style="font-weight:900; margin-bottom:8px;">آخر جلسة منتهية</div>
+      ${lastSession ? `
+        <div class="note"><strong>${escapeHtml(lastSession.emp)}</strong> • ${escapeHtml(lastSession.task)}</div>
+        <div class="note"><span class="mono">${fmtDT(lastSession.start)}</span> → <span class="mono">${fmtDT(lastSession.end)}</span></div>
+        <div class="note">Hours: <strong>${fmt(lastSession.hours)}</strong> • Pay: <span class="badge ${lastSession.pay === "Unpaid" ? "warn" : (lastSession.pay === "Paid" ? "good" : "")}">${lastSession.pay}</span></div>
+      ` : `<div class="note">لا توجد جلسات منتهية.</div>`}
+    </div>
+  `;
+        }
+
+        /* =========================
+           Inbox
+           ========================= */
+        function fillInboxFilters() {
+            // Statuses from Settings
+            fillStatusSelect($("#filterStatus"), true);
+            const assignees = ["all", ...Array.from(new Set(projectTasks().map(t => t.assignee)))];
+            $("#filterAssignee").innerHTML = assignees.map(a => `<option value="${escapeHtml(a)}">${a === "all" ? "كل المكلّفين" : escapeHtml(a)}</option>`).join("");
+        }
+        function buildInboxItems() {
+            const status = $("#filterStatus").value;
+            const assignee = $("#filterAssignee").value;
+            const q = ($("#filterSearch").value || "").trim().toLowerCase();
+
+            const tasks = projectTasks().filter(t => {
+                const okS = status === "all" ? true : t.status === status;
+                const okA = assignee === "all" ? true : t.assignee === assignee;
+                const okQ = !q ? true : (t.name.toLowerCase().includes(q) || t.id.toLowerCase().includes(q));
+                return okS && okA && okQ;
+            });
+
+            const items = tasks.map(t => {
+                const key = `${t.projectId}|${t.id}`;
+                const thread = state.chats[key] || [];
+                const last = thread.slice().sort((a, b) => new Date(b.ts) - new Date(a.ts))[0] || null;
+                return { task: t, key, last };
+            });
+
+            items.sort((a, b) => {
+                const prA = a.task.status === "Blocked" ? 0 : 1;
+                const prB = b.task.status === "Blocked" ? 0 : 1;
+                if (prA !== prB) return prA - prB;
+                const ta = a.last ? new Date(a.last.ts).getTime() : 0;
+                const tb = b.last ? new Date(b.last.ts).getTime() : 0;
+                return tb - ta;
+            });
+
+            return items;
+        }
+        function renderInboxList() {
+            const items = buildInboxItems();
+            $("#inboxList").innerHTML = items.map(it => {
+                const t = it.task;
+                const lastText = it.last ? it.last.text : "ابدأ محادثة لهذه المهمة...";
+                const lastBy = it.last ? it.last.by : "";
+                const lastTs = it.last ? fmtDT(it.last.ts) : "";
+                const active = selectedInboxKey === it.key;
+
+                return `
+      <div class="item ${active ? "active" : ""}" data-key="${it.key}">
+        <div class="top">
+          <div class="name"><span class="dot ${statusDot(t.status)}"></span>${escapeHtml(t.name)}</div>
+          <span class="badge ${badgeClass(t.status)}">${t.status}</span>
+        </div>
+        <div class="meta">
+          <span class="mono">${t.id}</span>
+          <span>${escapeHtml(t.assignee)}</span>
+          ${it.last ? `<span class="mono">آخر: ${lastTs}</span>` : ``}
+        </div>
+        <div class="note" style="margin-top:8px;">${escapeHtml((lastBy ? (lastBy + ": ") : "") + lastText).slice(0, 150)}${((lastBy ? (lastBy + ": ") : "") + lastText).length > 150 ? "…" : ""}</div>
+      </div>
+    `;
+            }).join("") || `<div class="note" style="padding:12px;">لا توجد نتائج.</div>`;
+
+            $$(".item", $("#inboxList")).forEach(el => {
+                el.addEventListener("click", () => {
+                    selectedInboxKey = el.dataset.key;
+                    renderInboxList();
+                    renderChat();
+                });
+            });
+
+            if (!selectedInboxKey && items.length) {
+                selectedInboxKey = items[0].key;
+                renderInboxList();
+                renderChat();
+            }
+        }
+        function renderChat() {
+            fillStatusSelect($("#chatStatus"), false);
+
+            const key = selectedInboxKey;
+            if (!key) {
+                $("#chatTitle").textContent = "—";
+                $("#chatMeta").textContent = "اختر مهمة لعرض المحادثة";
+                $("#chatBody").innerHTML = `<div class="note">لا توجد رسائل بعد.</div>`;
+                $("#chatInput").disabled = true;
+                $("#chatSend").disabled = true;
+                return;
+            }
+            const [pId, taskId] = key.split("|");
+            const task = state.tasks.find(t => t.projectId === pId && t.id === taskId);
+            const thread = state.chats[key] || [];
+
+            $("#chatTitle").textContent = `[${task.id}] ${task.name}`;
+            $("#chatMeta").textContent = `${task.assignee} • Project: ${state.projects.find(p => p.id === pId).name}`;
+            $("#chatStatus").value = task.status;
+            $("#chatInput").disabled = false;
+            $("#chatSend").disabled = false;
+
+            const base = thread.length ? thread : [{ ts: null, by: "", role: "", text: "ابدأ أول رسالة لهذه المهمة." }];
+            $("#chatBody").innerHTML = base.slice()
+                .sort((a, b) => new Date(a.ts || 0) - new Date(b.ts || 0))
+                .map(m => {
+                    const isAdmin = (m.role === "Leader" || m.role === "Manager");
+                    return `
+        <div class="bubble ${m.ts ? (isAdmin ? "admin" : "user") : "user"}">
+          <div class="meta">
+            <span class="who">${escapeHtml(m.by || "")}
+              ${m.role ? `<span class="badge" style="padding:2px 8px; font-size:12px;">${m.role}</span>` : ""}
+            </span>
+            <span class="mono">${m.ts ? fmtDT(m.ts) : ""}</span>
+          </div>
+          <div class="msg">${escapeHtml(m.text || "")}</div>
+        </div>
+      `;
+                }).join("");
+
+            const body = $("#chatBody");
+            body.scrollTop = body.scrollHeight;
+        }
+        function sendChat() {
+            if (!selectedInboxKey) return;
+            const text = ($("#chatInput").value || "").trim();
+            if (!text) return toast("تنبيه", "اكتب رسالة أولًا.");
+            const role = $("#chatRole").value;
+            const by = role === "Manager" ? "Anas (Manager)" : "Aya (Leader)";
+
+            if (!state.chats[selectedInboxKey]) state.chats[selectedInboxKey] = [];
+            const nextId = state.chats[selectedInboxKey].reduce((m, x) => Math.max(m, x.id || 0), 0) + 1;
+            state.chats[selectedInboxKey].push({ id: nextId, ts: new Date().toISOString(), by, role, text });
+
+            $("#chatInput").value = "";
+            saveState();
+            renderChat();
+            renderInboxList();
+            renderOverview();
+            hydrateKiosk(true);
+            toast("تم", "تم إرسال الرد.");
+        }
+        $("#chatSend").addEventListener("click", sendChat);
+        $("#chatInput").addEventListener("keydown", (e) => {
+            if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendChat(); }
+        });
+        $("#btnUpdateStatus").addEventListener("click", () => {
+            if (!selectedInboxKey) return;
+            const st = $("#chatStatus").value;
+            const [pId, taskId] = selectedInboxKey.split("|");
+            const task = state.tasks.find(t => t.projectId === pId && t.id === taskId);
+            task.status = st;
+            saveState();
+            renderChat();
+            renderInboxList();
+            renderOverview();
+            renderTasks();
+            hydrateKiosk(true);
+            toast("تم", "تم تحديث حالة المهمة.");
+        });
+        $("#filterStatus").addEventListener("change", renderInboxList);
+        $("#filterAssignee").addEventListener("change", renderInboxList);
+        $("#filterSearch").addEventListener("input", renderInboxList);
+
+
+        function empLabel(e) {
+            return `${e.name || e.id} (${e.role || "—"})`;
+        }
+        function fillStatusSelect(sel, includeAll) {
+            ensureSettings();
+            normalizeEmployees();
+            const arr = (state.config.statuses || []).filter(s => !(state.config.hiddenStatuses || []).includes(s));
+            const opts = includeAll ? ["all", ...arr] : arr;
+            sel.innerHTML = opts.map(v => {
+                const label = (v === "all") ? "كل الحالات" : v;
+                return `<option value="${escapeHtml(v)}">${escapeHtml(label)}</option>`;
+            }).join("");
+        }
+        function fillPrioritySelect(sel) {
+            ensureSettings();
+            normalizeEmployees();
+            const arr = (state.config.priorities || []).filter(s => !(state.config.hiddenPriorities || []).includes(s));
+            sel.innerHTML = arr.map(v => `<option value="${escapeHtml(v)}">${escapeHtml(v)}</option>`).join("");
+        }
+        function fillAssigneeSelect(sel) {
+            const emps = activeEmployees();
+            sel.innerHTML = emps.map(e => `<option value="${escapeHtml(e.id)}">${escapeHtml(empLabel(e))}</option>`).join("");
+        }
+        function syncTaskAssigneeFields(task, empId) {
+            const e = (state.employees || []).find(x => x.id === empId);
+            task.empId = empId;
+            task.assignee = e ? empLabel(e) : empId;
+        }
+
+        /* =========================
+           Tasks
+           ========================= */
+        function taskHours(task) {
+            return state.sessions
+                .filter(s => s.projectId === task.projectId && s.taskId === task.id && s.end)
+                .reduce((a, s) => a + (s.hours || 0), 0);
+        }
+        function renderTasks() {
+            const rows = projectTasks().slice().sort((a, b) => a.id.localeCompare(b.id));
+            $("#tblTasks").innerHTML = rows.map(t => `
+    <tr>
+      <td><strong>${escapeHtml(t.name)}</strong></td>
+      <td class="mono">${t.id}</td>
+      <td>${escapeHtml(t.assignee)}</td>
+      <td><span class="badge ${badgeClass(t.status)}">${t.status}</span></td>
+      <td><span class="badge ${t.priority === "High" ? "warn" : (t.priority === "Medium" ? "info" : "")}">${t.priority}</span></td>
+      <td class="mono">${t.start}</td>
+      <td class="mono">${t.due}</td>
+      <td>${fmt(taskHours(t))}</td>
+    </tr>
+  `).join("") || `<tr><td colspan="8" class="note">لا توجد مهام.</td></tr>`;
+
+            $("#taskPick").innerHTML = rows.map(t => `<option value="${t.id}">[${t.id}] ${escapeHtml(t.name)}</option>`).join("");
+            // Dynamic selects from Settings
+            fillStatusSelect($("#taskSetStatus"), false);
+            fillPrioritySelect($("#taskSetPriority"));
+            fillAssigneeSelect($("#taskSetAssignee"));
+            if (rows.length) {
+                if (!$("#taskPick").value) $("#taskPick").value = rows[0].id;
+                loadTaskToForm();
+            } else {
+                $("#taskSetNotes").value = "";
+            }
+        }
+        function loadTaskToForm() {
+            const id = $("#taskPick").value;
+            const t = projectTasks().find(x => x.id === id);
+            if (!t) return;
+            $("#taskSetStatus").value = t.status;
+            $("#taskSetPriority").value = t.priority;
+            // Assignee
+            const empId = t.empId || (state.employees || []).find(e => empLabel(e) === t.assignee)?.id;
+            if (empId) $("#taskSetAssignee").value = empId;
+            $("#taskSetStart").value = t.start;
+            $("#taskSetDue").value = t.due;
+            $("#taskSetNotes").value = t.notes || "";
+        }
+        $("#taskPick").addEventListener("change", loadTaskToForm);
+        $("#btnSaveTask").addEventListener("click", () => {
+            const id = $("#taskPick").value;
+            const t = projectTasks().find(x => x.id === id);
+            if (!t) return;
+            t.status = $("#taskSetStatus").value;
+            t.priority = $("#taskSetPriority").value;
+            // Assignee
+            const newEmpId = $("#taskSetAssignee").value;
+            if (newEmpId) syncTaskAssigneeFields(t, newEmpId);
+            t.start = $("#taskSetStart").value || t.start;
+            t.due = $("#taskSetDue").value || t.due;
+            t.notes = $("#taskSetNotes").value || "";
+            saveState();
+            renderTasks();
+            renderOverview();
+            renderInboxList();
+            hydrateKiosk(true);
+            toast("تم", "تم حفظ المهمة.");
+        });
+
+        /* =========================
+           Hours
+           ========================= */
+        function fillHoursFilters() {
+            const emps = ["all", ...Array.from(new Set(projectSessions().map(s => s.empId)))];
+            $("#hoursEmp").innerHTML = emps.map(eid => {
+                if (eid === "all") return `<option value="all">كل الموظفين</option>`;
+                const e = state.employees.find(x => x.id === eid);
+                return `<option value="${eid}">${e ? escapeHtml(e.name) : eid} — ${eid}</option>`;
+            }).join("");
+        }
+        function renderSessions() {
+            const emp = $("#hoursEmp").value;
+            const pay = $("#hoursPay").value;
+            const from = $("#hoursFrom").value ? new Date($("#hoursFrom").value).getTime() : null;
+            const to = $("#hoursTo").value ? (new Date($("#hoursTo").value).getTime() + 24 * 3600 * 1000 - 1) : null;
+
+            let rows = projectSessions().slice().sort((a, b) => (b.id - a.id));
+            if (emp !== "all") rows = rows.filter(s => s.empId === emp);
+            if (pay !== "all") rows = rows.filter(s => {
+                if (pay === "Open") return !s.end;
+                if (pay === "Approved") return !!s.approved;
+                return s.pay === pay;
+            });
+            if (from) rows = rows.filter(s => new Date(s.start).getTime() >= from);
+            if (to) rows = rows.filter(s => new Date(s.start).getTime() <= to);
+
+            $("#tblSessions").innerHTML = rows.map(s => `
+    <tr>
+      <td class="mono">${s.id}</td>
+      <td>${escapeHtml(s.emp)}</td>
+      <td class="mono">${s.empId}</td>
+      <td>${escapeHtml(s.task)}</td>
+      <td class="mono">${s.taskId}</td>
+      <td>${fmtDT(s.start)}</td>
+      <td>${s.end ? fmtDT(s.end) : `<span class="badge warn">Open</span>`}</td>
+      <td>${s.end ? fmt(s.hours) : "—"}</td>
+      <td>${s.end ? `<span class="badge ${badgeClass(s.endStatus)}">${s.endStatus}</span>` : "—"}</td>
+      <td>
+        ${!s.end ? `<span class="badge warn">Open</span>` :
+                    (s.approved ? `<span class="badge good">Approved</span>` :
+                        `<span class="badge ${s.pay === "Unpaid" ? "warn" : (s.pay === "Paid" ? "good" : "")}">${s.pay}</span>`)}
+      </td>
+      <td>
+        ${(!s.end) ? "—" : (s.approved ? `<span class="badge good">OK</span>` : `<button class="btn primary" data-approve="${s.id}" type="button">Approve</button>`)}
+      </td>
+    </tr>
+  `).join("") || `<tr><td colspan="11" class="note">لا توجد جلسات.</td></tr>`;
+
+            $$("button[data-approve]").forEach(b => {
+                b.addEventListener("click", () => {
+                    const id = Number(b.dataset.approve);
+                    const sess = state.sessions.find(x => x.projectId === currentProjectId && x.id === id);
+                    if (!sess) return;
+                    sess.approved = true;
+                    saveState();
+                    renderSessions();
+                    renderOverview();
+                    toast("تم", `تم اعتماد الجلسة #${id}.`);
+                });
+            });
+        }
+        $("#hoursEmp").addEventListener("change", renderSessions);
+        $("#hoursPay").addEventListener("change", renderSessions);
+        $("#hoursFrom").addEventListener("change", renderSessions);
+        $("#hoursTo").addEventListener("change", renderSessions);
+
+        /* =========================
+           Kiosk (Employee)
+           ========================= */
+        function findEmployeeById(id) { return state.employees.find(e => e.id === id); }
+        function getAssignedTasksForEmp(empId) {
+            // show ONLY assigned to this employee and this project (hide Done to keep list clean)
+            return state.tasks.filter(t => t.projectId === currentProjectId && t.empId === empId && t.status !== "Done");
+        }
+        function enableKiosk(enabled) {
+            $("#k_taskSelect").disabled = !enabled;
+            $("#k_statusSelect").disabled = !enabled;
+            $("#k_notes").disabled = !enabled;
+            $("#k_btnIn").disabled = !enabled;
+            $("#k_btnOut").disabled = !enabled;
+            $("#k_btnIn2").disabled = !enabled;
+            $("#k_btnOut2").disabled = !enabled;
+            $("#k_chatInput").disabled = !enabled;
+            $("#k_chatSend").disabled = !enabled;
+        }
+        function fillKioskTasks(tasks) {
+            $("#k_taskSelect").innerHTML =
+                `<option value="">اختر مهمة...</option>` +
+                tasks.map(t => `<option value="${t.id}">[${t.id}] ${escapeHtml(t.name)} — (${t.status})</option>`).join("");
+        }
+
+        function getOpenSessionsCount(empId) {
+            return state.sessions.filter(s => s.projectId === currentProjectId && s.empId === empId && !s.end).length;
+        }
+        function computeHoursAll(empId) {
+            return state.sessions.filter(s => s.projectId === currentProjectId && s.empId === empId && s.end).reduce((a, s) => a + (s.hours || 0), 0);
+        }
+        function computeUnpaidHours(empId) {
+            return state.sessions.filter(s => s.projectId === currentProjectId && s.empId === empId && s.end && s.pay === "Unpaid").reduce((a, s) => a + (s.hours || 0), 0);
+        }
+        function hasOpenSession(empId, taskId) {
+            return state.sessions.some(s => s.projectId === currentProjectId && s.empId === empId && s.taskId === taskId && !s.end);
+        }
+
+        function renderKioskKPIs() {
+            if (!k_currentEmp) {
+                $("#k_kpiHours").textContent = "—";
+                $("#k_kpiOpen").textContent = "—";
+                $("#k_kpiUnpaid").textContent = "—";
+                return;
+            }
+            $("#k_kpiHours").textContent = fmt(computeHoursAll(k_currentEmp.id));
+            $("#k_kpiOpen").textContent = getOpenSessionsCount(k_currentEmp.id);
+            $("#k_kpiUnpaid").textContent = fmt(computeUnpaidHours(k_currentEmp.id));
+        }
+        function renderKioskHistory() {
+            if (!k_currentEmp) {
+                $("#k_tblHistory").innerHTML = `<tr><td colspan="5" class="note">سجّل البحث أولًا.</td></tr>`;
+                return;
+            }
+            const rows = (state.log || [])
+                .filter(l => l.projectId === currentProjectId && l.empId === k_currentEmp.id)
+                .sort((a, b) => new Date(b.ts) - new Date(a.ts))
+                .slice(0, 10);
+
+            $("#k_tblHistory").innerHTML = rows.length ? rows.map(r => `
+    <tr>
+      <td class="mono">${fmtDT(r.ts)}</td>
+      <td>${escapeHtml(r.task)}</td>
+      <td>${r.action === "IN" ? `<span class="badge">IN</span>` : `<span class="badge good">OUT</span>`}</td>
+      <td><span class="badge ${badgeClass(r.status)}">${r.status}</span></td>
+      <td>${escapeHtml(r.notes || "")}</td>
+    </tr>
+  `).join("") : `<tr><td colspan="5" class="note">لا توجد سجلات بعد.</td></tr>`;
+        }
+        function renderKioskChat() {
+            const taskId = String($("#k_taskSelect").value || "").trim();
+            if (!k_currentEmp || !taskId) {
+                $("#k_chatTitle").textContent = "—";
+                $("#k_chatMeta").textContent = "اختر مهمة لعرض المحادثة";
+                $("#k_chatBody").innerHTML = `<div class="note">—</div>`;
+                $("#k_chatInput").disabled = true;
+                $("#k_chatSend").disabled = true;
+                return;
+            }
+            const key = `${currentProjectId}|${taskId}`;
+            const task = state.tasks.find(t => t.projectId === currentProjectId && t.id === taskId);
+            const thread = state.chats[key] || [];
+
+            $("#k_chatTitle").textContent = `[${task.id}] ${task.name}`;
+            $("#k_chatMeta").textContent = `Project: ${state.projects.find(p => p.id === currentProjectId).name} • Assignee: ${task.assignee}`;
+            $("#k_chatInput").disabled = false;
+            $("#k_chatSend").disabled = false;
+
+            const base = thread.length ? thread : [{ ts: null, by: "", role: "", text: "ابدأ أول رسالة لهذه المهمة." }];
+            $("#k_chatBody").innerHTML = base.slice()
+                .sort((a, b) => new Date(a.ts || 0) - new Date(b.ts || 0))
+                .map(m => {
+                    const isAdmin = (m.role === "Leader" || m.role === "Manager");
+                    return `
+        <div class="bubble ${m.ts ? (isAdmin ? "admin" : "user") : "user"}">
+          <div class="meta">
+            <span class="who">${escapeHtml(m.by || "")}
+              ${m.role ? `<span class="badge" style="padding:2px 8px; font-size:12px;">${m.role}</span>` : ""}
+            </span>
+            <span class="mono">${m.ts ? fmtDT(m.ts) : ""}</span>
+          </div>
+          <div class="msg">${escapeHtml(m.text || "")}</div>
+        </div>
+      `;
+                }).join("");
+            const body = $("#k_chatBody");
+            body.scrollTop = body.scrollHeight;
+        }
+        function kioskSearch() {
+            const id = String($("#k_empId").value || "").trim();
+            const emp = findEmployeeById(id);
+            if (!emp) {
+                k_currentEmp = null;
+                $("#k_empName").value = "";
+                fillKioskTasks([]);
+                enableKiosk(false);
+                renderKioskKPIs(); renderKioskHistory(); renderKioskChat();
+                toast("غير موجود", "تأكد من الرقم الوظيفي.");
+                return;
+            }
+            k_currentEmp = emp;
+            $("#k_empName").value = emp.name;
+            const tasks = getAssignedTasksForEmp(emp.id);
+            fillKioskTasks(tasks);
+            if (tasks.length) $("#k_taskSelect").value = tasks[0].id;
+            enableKiosk(true);
+            renderKioskKPIs(); renderKioskHistory(); renderKioskChat();
+        }
+        function kioskIN() {
+            if (!k_currentEmp) return toast("تنبيه", "ابحث أولاً.");
+            const taskId = $("#k_taskSelect").value;
+            if (!taskId) return toast("تنبيه", "اختر مهمة.");
+            const st = $("#k_statusSelect").value || "In Progress";
+            if (!["Not Started", "In Progress", "Blocked"].includes(st)) return toast("خطأ", "IN يسمح: Not Started / In Progress / Blocked");
+            if (hasOpenSession(k_currentEmp.id, taskId)) return toast("تنبيه", "يوجد جلسة مفتوحة لنفس المهمة.");
+
+            const task = state.tasks.find(t => t.projectId === currentProjectId && t.id === taskId);
+            const now = new Date().toISOString();
+            const newId = state.sessions.reduce((m, s) => Math.max(m, s.id), 0) + 1;
+
+            state.sessions.push({
+                id: newId, projectId: currentProjectId, empId: k_currentEmp.id, emp: k_currentEmp.name,
+                taskId: task.id, task: task.name,
+                start: now, end: null, hours: null, endStatus: "", pay: "Open", approved: false
+            });
+
+            const logId = (state.log || []).reduce((m, l) => Math.max(m, l.id || 0), 0) + 1;
+            state.log = state.log || [];
+            state.log.push({ id: logId, ts: now, projectId: currentProjectId, empId: k_currentEmp.id, taskId: task.id, task: task.name, action: "IN", status: st, notes: String($("#k_notes").value || "") });
+
+            task.status = st === "Not Started" ? "Not Started" : (st === "Blocked" ? "Blocked" : "In Progress");
+
+            $("#k_notes").value = "";
+            saveState();
+            hydrateAll();
+            toast("تم", "تم تسجيل IN.");
+        }
+        function kioskOUT() {
+            if (!k_currentEmp) return toast("تنبيه", "ابحث أولاً.");
+            const taskId = $("#k_taskSelect").value;
+            if (!taskId) return toast("تنبيه", "اختر مهمة.");
+            const st = $("#k_statusSelect").value || "Done";
+            if (!["In Progress", "Blocked", "Done"].includes(st)) return toast("خطأ", "OUT يسمح: In Progress / Blocked / Done");
+
+            const open = [...state.sessions].reverse().find(s => s.projectId === currentProjectId && s.empId === k_currentEmp.id && s.taskId === taskId && !s.end);
+            if (!open) return toast("تنبيه", "لا توجد جلسة مفتوحة لهذه المهمة.");
+
+            const now = new Date();
+            const endIso = now.toISOString();
+            const start = new Date(open.start);
+            const hours = (now - start) / (1000 * 60 * 60);
+
+            open.end = endIso;
+            open.hours = Math.round(hours * 100) / 100;
+            open.endStatus = st;
+            open.pay = "Unpaid";
+
+            const task = state.tasks.find(t => t.projectId === currentProjectId && t.id === taskId);
+            task.status = st;
+
+            const logId = (state.log || []).reduce((m, l) => Math.max(m, l.id || 0), 0) + 1;
+            state.log.push({ id: logId, ts: endIso, projectId: currentProjectId, empId: k_currentEmp.id, taskId: task.id, task: task.name, action: "OUT", status: st, notes: String($("#k_notes").value || "") });
+
+            $("#k_notes").value = "";
+            saveState();
+            hydrateAll();
+            toast("تم", `تم تسجيل OUT — ${open.hours.toFixed(2)} ساعة`);
+        }
+        function kioskSendChat() {
+            if (!k_currentEmp) return toast("تنبيه", "ابحث أولاً.");
+            const taskId = String($("#k_taskSelect").value || "").trim();
+            if (!taskId) return toast("تنبيه", "اختر مهمة.");
+            const text = String($("#k_chatInput").value || "").trim();
+            if (!text) return toast("تنبيه", "اكتب رسالة.");
+
+            const key = `${currentProjectId}|${taskId}`;
+            if (!state.chats[key]) state.chats[key] = [];
+            const nextId = state.chats[key].reduce((m, x) => Math.max(m, x.id || 0), 0) + 1;
+            state.chats[key].push({ id: nextId, ts: new Date().toISOString(), by: k_currentEmp.name, role: "Employee", text });
+
+            $("#k_chatInput").value = "";
+            saveState();
+            hydrateAll();
+            toast("تم", "تم إرسال الرسالة.");
+        }
+
+        $("#k_btnSearch").addEventListener("click", kioskSearch);
+        $("#k_empId").addEventListener("keydown", (e) => { if (e.key === "Enter") { e.preventDefault(); kioskSearch(); } });
+        $("#k_taskSelect").addEventListener("change", () => { renderKioskChat(); });
+        $("#k_btnIn").addEventListener("click", kioskIN);
+        $("#k_btnOut").addEventListener("click", kioskOUT);
+        $("#k_btnIn2").addEventListener("click", kioskIN);
+        $("#k_btnOut2").addEventListener("click", kioskOUT);
+        $("#k_chatSend").addEventListener("click", kioskSendChat);
+        $("#k_chatInput").addEventListener("keydown", (e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); kioskSendChat(); } });
+
+        /* =========================
+           Reset / Export
+           ========================= */
+        $("#btnSeed").addEventListener("click", () => {
+            state = seed();
+            currentProjectId = "PRJ-002";
+            selectedInboxKey = null;
+            k_currentEmp = null;
+            saveState();
+            hydrateAll();
+            toast("تم", "تمت إعادة بيانات الديمو.");
+        });
+        $("#btnExport").addEventListener("click", () => {
+            const blob = new Blob([JSON.stringify(state, null, 2)], { type: "application/json" });
+            const a = document.createElement("a");
+            a.href = URL.createObjectURL(blob);
+            a.download = "simt-suite-demo.json";
+            a.click();
+            toast("تم", "تم تصدير JSON.");
+        });
+
+        /* =========================
+           Hydration
+           ========================= */
+        function hydrateKiosk(keepEmp = false) {
+            // Preserve current employee across renders
+            if (!keepEmp && !$("#k_empId").value) {
+                $("#k_empId").value = "E-3001";
+            }
+            if (!$("#k_empId").value) $("#k_empId").value = "E-3001";
+            kioskSearch();
+        }
+        function fillHoursFiltersSafe() {
+            // only if element exists in DOM (it does, but keep safe)
+            if ($("#hoursEmp")) fillHoursFilters();
+        }
+        function hydrateAll() {
+            fillProjectSelect();
+            renderOverview();
+            fillInboxFilters();
+            renderInboxList();
+            renderChat();
+            renderTasks();
+            fillHoursFiltersSafe();
+            renderSessions();
+            // Kiosk last to reflect updated tasks/status
+            hydrateKiosk(true);
+        }
+
+        window.addEventListener("DOMContentLoaded", () => {
+            state = loadState() || seed();
+
+            ensurePayments();
+            ensureSettings();
+            normalizeEmployees();
+            saveState();
+            // Default open kiosk on E-3001
+            $("#k_empId").value = "E-3001";
+            setView("kiosk");
+            hydrateAll();
+        });
+
+
+
+
+        /* ===== Settings Tab Logic (v15 | Budget + Job Titles + Project Stats) ===== */
+        let settingsView = "projects";
+        let settingsSelectedId = null;
+        let pendingLogoDataUrl = "";
+
+        /* Helpers */
+        function activeProjects() { return (state.projects || []).filter(p => !p.hidden); }
+        function activeEmployees() { return (state.employees || []).filter(e => !e.hidden); }
+        function activeJobTitles() {
+            ensureSettings();
+            const all = (state.config.jobTitles || []).filter(t => !(state.config.hiddenJobTitles || []).includes(t));
+            return all.length ? all : ["Manager", "Leader", "Front-end", "Back-end"];
+        }
+
+        function normalizeEmployees() {
+            (state.employees || []).forEach(e => {
+                if (e.hidden == null) e.hidden = false;
+                if (e.country == null) e.country = "Saudi Arabia";
+                if (e.city == null) e.city = "Riyadh";
+                if (e.address == null) e.address = "";
+                if (e.dob == null) e.dob = "";
+                if (e.nationalId == null) e.nationalId = "";
+                if (e.contractFile == null) e.contractFile = "";
+                if (e.ndaFile == null) e.ndaFile = "";
+                if (e.role == null) e.role = "Front-end";
+            });
+        }
+
+        function normalizeProjects() {
+            (state.projects || []).forEach(p => {
+                if (p.hidden == null) p.hidden = false;
+                if (p.createdAt == null) p.createdAt = new Date().toISOString();
+                if (p.budget == null) p.budget = 0; // USD
+            });
+        }
+
+        function ensureSettings() {
+            if (!state.config) state.config = {};
+            if (!state.config.statuses) state.config.statuses = ["Backlog", "In Progress", "Blocked", "Review", "Done"];
+            if (!state.config.priorities) state.config.priorities = ["Low", "Medium", "High", "Urgent"];
+            if (!state.config.hiddenStatuses) state.config.hiddenStatuses = [];
+            if (!state.config.hiddenPriorities) state.config.hiddenPriorities = [];
+
+            if (!state.config.jobTitles) state.config.jobTitles = ["Manager", "Leader", "Front-end", "Back-end"];
+            if (!state.config.hiddenJobTitles) state.config.hiddenJobTitles = [];
+
+            if (!state.config.general) state.config.general = {
+                currency: "USD",
+                fxSarPerUsd: 3.75,
+                workdayHours: 8,
+                timezone: "Asia/Riyadh",
+                systemName: "Simt App",
+                systemDesc: "لوحة لإدارة المشاريع والمهام والساعات والمدفوعات.",
+                logoDataUrl: ""
+            };
+        }
+
+        function empRateById(empId) {
+            const e = (state.employees || []).find(x => x.id === empId);
+            return e ? Number(e.rate || 0) : 0;
+        }
+        function taskById(taskId) { return (state.tasks || []).find(t => t.id === taskId) || null; }
+        function projectById(projectId) { return (state.projects || []).find(p => p.id === projectId) || null; }
+
+        function entryHours(entry) {
+            if (entry == null) return 0;
+            if (entry.hours != null && !isNaN(Number(entry.hours))) return Number(entry.hours);
+            const s = entry.start || entry.startAt || entry.startedAt;
+            const e = entry.end || entry.endAt || entry.endedAt;
+            if (!s || !e) return 0;
+            const sd = new Date(s); const ed = new Date(e);
+            const ms = ed - sd;
+            if (!isFinite(ms) || ms <= 0) return 0;
+            return ms / 36e5;
+        }
+        function hoursForProject(projectId) {
+            let sum = 0;
+            (state.timeEntries || state.tracking || state.entries || []).forEach(en => {
+                const t = taskById(en.taskId || en.task || en.task_id);
+                if (t && t.projectId === projectId) sum += entryHours(en);
+            });
+            return sum;
+        }
+        function employeesWorkedOnProject(projectId) {
+            const set = new Set();
+            (state.timeEntries || state.tracking || state.entries || []).forEach(en => {
+                const t = taskById(en.taskId || en.task || en.task_id);
+                if (t && t.projectId === projectId) {
+                    const emp = en.employeeId || en.employee || en.empId || en.emp;
+                    if (emp) set.add(emp);
+                }
+            });
+            (state.tasks || []).forEach(t => { if (t.projectId === projectId && t.assignee) set.add(t.assignee); });
+            return Array.from(set);
+        }
+        function tasksCountForProject(projectId) { return (state.tasks || []).filter(t => t.projectId === projectId).length; }
+        function costForProject(projectId) {
+            let cost = 0;
+            (state.timeEntries || state.tracking || state.entries || []).forEach(en => {
+                const t = taskById(en.taskId || en.task || en.task_id);
+                if (t && t.projectId === projectId) {
+                    const emp = en.employeeId || en.employee || en.empId || en.emp;
+                    cost += entryHours(en) * empRateById(emp);
+                }
+            });
+            return cost;
+        }
+
+        /* Drawer */
+        function openDrawer(title, sub) {
+            const d = $("#sDrawer");
+            if (!d) return;
+            $("#sDrawerTitle").textContent = title || "تحرير";
+            $("#sDrawerSub").textContent = sub || "";
+            d.classList.add("open");
+            d.setAttribute("aria-hidden", "false");
+            document.body.style.overflow = "hidden";
+        }
+        function closeDrawer() {
+            const d = $("#sDrawer");
+            if (!d) return;
+            d.classList.remove("open");
+            d.setAttribute("aria-hidden", "true");
+            document.body.style.overflow = "";
+        }
+
+        function renderSettingsTab() {
+            ensureSettings(); normalizeEmployees(); normalizeProjects();
+            const nav = $("#settingsNav");
+            if (nav) nav.querySelectorAll(".snav").forEach(b => b.classList.toggle("active", b.dataset.sview === settingsView));
+            if (settingsView !== "general" && (settingsSelectedId == null)) {
+                const items = settingsGetItems(settingsView);
+                settingsSelectedId = items[0] ? items[0]._id : null;
+            }
+            renderSettingsList();
+            if (settingsView === "general") closeDrawer();
+        }
+
+        function settingsGetItems(view) {
+            ensureSettings();
+            if (view === "projects") return (state.projects || []).map(p => ({ ...p, _id: p.id, _label: (p.name || p.id), _hidden: !!p.hidden }));
+            if (view === "employees") return (state.employees || []).map(e => ({ ...e, _id: e.id, _label: `${e.name || e.id} (${e.role || "—"})`, _hidden: !!e.hidden }));
+            if (view === "statuses") {
+                const all = (state.config.statuses || []).map(s => ({ _id: s, _label: s, _hidden: false }));
+                const hidden = (state.config.hiddenStatuses || []).map(s => ({ _id: s, _label: s, _hidden: true }));
+                return [...all, ...hidden];
+            }
+            if (view === "priorities") {
+                const all = (state.config.priorities || []).map(s => ({ _id: s, _label: s, _hidden: false }));
+                const hidden = (state.config.hiddenPriorities || []).map(s => ({ _id: s, _label: s, _hidden: true }));
+                return [...all, ...hidden];
+            }
+            if (view === "jobtitles") {
+                const all = (state.config.jobTitles || []).map(s => ({ _id: s, _label: s, _hidden: false }));
+                const hidden = (state.config.hiddenJobTitles || []).map(s => ({ _id: s, _label: s, _hidden: true }));
+                return [...all, ...hidden];
+            }
+            return [];
+        }
+
+        function renderSettingsList() {
+            const card = $("#settingsListCard");
+            if (!card) return;
+
+            if (settingsView === "general") {
+                const g = state.config.general || {};
+                card.classList.add("generalInline");
+                card.innerHTML = `
+      <div class="head">
+        <div><div class="title">إعدادات عامة</div><div class="sub">هوية النظام والخيارات العامة.</div></div>
+        <span class="pill">General</span>
+      </div>
+      <div class="row">
+        <div class="field"><label>العملة الأساسية (ثابت)</label><input id="gCurrency" value="USD" disabled /></div>
+        <div class="field">
+          <label>معدل التحويل إلى الريال (SAR لكل 1 USD)</label>
+          <input id="gFx" type="number" step="0.01" value="${Number(g.fxSarPerUsd || 3.75)}"/>
+          <div class="fileHint">مثال: 100$ ≈ ${(100 * Number(g.fxSarPerUsd || 3.75)).toFixed(2)} ر.س</div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="field"><label>المنطقة الزمنية</label><input id="gTz" value="${escapeHtml(g.timezone || "Asia/Riyadh")}"/></div>
+        <div class="field"><label>Workday Hours</label><input id="gWorkday" type="number" step="1" value="${Number(g.workdayHours || 8)}"/></div>
+      </div>
+      <div class="row">
+        <div class="field"><label>اسم النظام</label><input id="gName" value="${escapeHtml(g.systemName || "Simt App")}"/></div>
+        <div class="field"><label>وصف النظام</label><input id="gDesc" value="${escapeHtml(g.systemDesc || "")}"/></div>
+      </div>
+      <div class="row">
+        <div class="field">
+          <label>الشعار (Logo)</label>
+          <div style="display:flex; gap:10px; align-items:center;">
+            <div class="logoPreview" id="logoPreview">${g.logoDataUrl ? `<img src="${g.logoDataUrl}" alt="logo"/>` : `<span class="muted">No</span>`}</div>
+            <input id="gLogo" type="file" accept="image/*" />
+          </div>
+          <div class="fileHint">Demo: تُحفظ داخل المتصفح كصورة.</div>
+        </div>
+      </div>
+      <div class="actions"><button type="button" class="btn" id="btnSaveGeneral">Save</button></div>
+    `;
+                return;
+            }
+            card.classList.remove("generalInline");
+
+            const items = settingsGetItems(settingsView);
+            const titleMap = { projects: "المشاريع", employees: "الموظفين", statuses: "الحالات", priorities: "الأولوية", jobtitles: "المسمى الوظيفي" };
+
+            const header = `
+    <div class="splitHead">
+      <div><div class="title">${titleMap[settingsView]}</div><div class="sub">${items.length} عنصر</div></div>
+      <button type="button" class="btn" id="btnNewItem">إضافة</button>
+    </div>
+  `;
+
+            if (settingsView === "projects") {
+                const fx = Number((state.config.general && state.config.general.fxSarPerUsd) || 3.75);
+                card.innerHTML = header + `
+      <div class="list">
+        ${items.map(it => {
+                    const pid = it._id;
+                    const tCount = tasksCountForProject(pid);
+                    const emps = employeesWorkedOnProject(pid);
+                    const hrs = hoursForProject(pid);
+                    const cost = costForProject(pid);
+                    const budget = Number(it.budget || 0);
+                    const over = (budget > 0 && cost > budget);
+                    const added = it.createdAt ? new Date(it.createdAt).toLocaleDateString("ar-SA") : "—";
+                    return `
+          <div class="itemRow ${it._hidden ? 'toggle off' : ''} ${over ? 'budgetOver' : ''}">
+            <div class="projRow" style="width:100%;">
+              <div data-pick-item="${escapeHtml(pid)}" style="cursor:pointer; flex:1; min-width:0;">
+                <div class="name">${escapeHtml(it._label)}</div>
+                <div class="projMeta">
+                  <span class="pill small">أضيف: ${escapeHtml(added)}</span>
+                  <span class="pill small">مهام: ${tCount}</span>
+                  <span class="pill small">موظفين: ${emps.length}</span>
+                  <span class="pill small">ساعات: ${hrs.toFixed(1)}</span>
+                  ${budget > 0 ? `<span class="pill small">ميزانية: $${budget.toFixed(0)}</span>` : ''}
+                  ${budget > 0 ? `<span class="pill small">${over ? `تجاوز` : `ضمن`}</span>` : ''}
+                </div>
+                ${budget > 0 ? `<div class="mutedTiny">التكلفة التقديرية: $${cost.toFixed(0)} (≈ ${(cost * fx).toFixed(0)} ر.س)</div>` : ''}
+              </div>
+              <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap; justify-content:flex-end;">
+                <button type="button" class="btn toggle" data-toggle-item="${escapeHtml(pid)}">${it._hidden ? 'إظهار' : 'إخفاء'}</button>
+                <button type="button" class="btn" data-pick-item="${escapeHtml(pid)}">تعديل</button>
+              </div>
+            </div>
+          </div>`;
+                }).join("") || `<div class="muted">لا يوجد مشاريع.</div>`}
+      </div>
+    `;
+                return;
+            }
+
+            if (settingsView === "employees") {
+                card.innerHTML = header + `
+      <div class="empCards">
+        ${items.map(it => `
+          <div class="empCard ${it._hidden ? 'off' : ''}">
+            <div class="left" data-pick-item="${escapeHtml(it._id)}">
+              <div class="avatar">${escapeHtml((it.name || it._id).trim().slice(0, 1).toUpperCase())}</div>
+              <div>
+                <div class="name">${escapeHtml(it.name || it._id)}</div>
+                <div class="subline">${escapeHtml(it.role || "—")} • ${escapeHtml(it._id)} • ${Number(it.rate || 0).toFixed(2)}/hr</div>
+                <div class="tags">
+                  <span class="pill small">${escapeHtml(it.country || "—")}</span>
+                  <span class="pill small">${escapeHtml(it.city || "—")}</span>
+                  ${it._hidden ? `<span class="pill small">Hidden</span>` : ''}
+                </div>
+              </div>
+            </div>
+            <div class="actionsCol">
+              <button type="button" class="btn toggle" data-toggle-item="${escapeHtml(it._id)}">${it._hidden ? 'إظهار' : 'إخفاء'}</button>
+              <button type="button" class="btn" data-pick-item="${escapeHtml(it._id)}">تعديل</button>
+            </div>
+          </div>
+        `).join("") || `<div class="muted">لا يوجد موظفين.</div>`}
+      </div>
+    `;
+                return;
+            }
+
+            card.innerHTML = header + `
+    <div class="list">
+      ${items.map(it => `
+        <div class="itemRow ${it._hidden ? 'toggle off' : ''}">
+          <div data-pick-item="${escapeHtml(it._id)}" style="cursor:pointer; flex:1; min-width:0;">
+            <div class="name">${escapeHtml(it._label)}</div>
+            <div class="meta">
+              <span class="pill small">${escapeHtml(it._id)}</span>
+              ${it._hidden ? `<span class="pill small">Hidden</span>` : ''}
+            </div>
+          </div>
+          <div style="display:flex; gap:8px; align-items:center;">
+            <button type="button" class="btn toggle" data-toggle-item="${escapeHtml(it._id)}">${it._hidden ? 'إظهار' : 'إخفاء'}</button>
+            <button type="button" class="btn" data-pick-item="${escapeHtml(it._id)}">تعديل</button>
+          </div>
+        </div>
+      `).join("") || `<div class="muted">لا يوجد عناصر.</div>`}
+    </div>
+  `;
+        }
+
+        function renderSettingsEditor() {
+            const body = $("#settingsDetailCard");
+            if (!body) return;
+            ensureSettings(); normalizeEmployees(); normalizeProjects();
+
+            const items = settingsGetItems(settingsView);
+            const it = items.find(x => x._id === settingsSelectedId) || null;
+
+            const headerTitle = { projects: "تحرير مشروع", employees: "تحرير موظف", statuses: "تحرير حالة", priorities: "تحرير أولوية", jobtitles: "تحرير مسمى" }[settingsView] || "تحرير";
+            const sub = it ? `ID: ${it._id}` : "عنصر جديد";
+
+            $("#sDrawerTitle").textContent = headerTitle;
+            $("#sDrawerSub").textContent = sub;
+
+            body.innerHTML = `${renderDetailForm(settingsView, it)}`;
+        }
+
+        function renderDetailForm(view, it) {
+            if (view === "projects") {
+                const id = it ? it._id : "";
+                const name = it ? (it.name || "") : "";
+                const budget = it ? Number(it.budget || 0) : 0;
+                return `
+      <div class="row">
+        <div class="field"><label>Project ID</label><input id="pId" value="${escapeHtml(id)}" placeholder="PRJ-004" ${it ? 'disabled' : ''}/></div>
+        <div class="field"><label>Project Name</label><input id="pName" value="${escapeHtml(name)}" placeholder="Simt Mobile Revamp"/></div>
+      </div>
+      <div class="row">
+        <div class="field"><label>Budget (USD)</label><input id="pBudget" type="number" step="1" value="${budget}" placeholder="5000"/></div>
+        <div class="field"><label>تنبيه</label><input value="عند تجاوز الميزانية يصبح المشروع أحمر (Pastel)" disabled /></div>
+      </div>
+      <div class="actions"><button type="button" class="btn" id="${it ? 'btnUpdateProject' : 'btnAddProject'}">${it ? 'Update' : 'Add'}</button></div>
+      <div class="muted">بدلاً من الحذف: استخدم إخفاء/إظهار من القائمة.</div>
+    `;
+            }
+
+            if (view === "employees") {
+                const id = it ? it._id : "";
+                const name = it ? (it.name || "") : "";
+                const role = it ? (it.role || "Front-end") : "Front-end";
+                const rate = it ? Number(it.rate || 0) : 0;
+                const country = it ? (it.country || "") : "";
+                const city = it ? (it.city || "") : "";
+                const address = it ? (it.address || "") : "";
+                const dob = it ? (it.dob || "") : "";
+                const nationalId = it ? (it.nationalId || "") : "";
+                const contractName = it ? (it.contractFile || "") : "";
+                const ndaName = it ? (it.ndaFile || "") : "";
+                const titles = activeJobTitles();
+                return `
+      <div class="row">
+        <div class="field"><label>Employee ID</label><input id="eId" value="${escapeHtml(id)}" placeholder="E-5001" ${it ? 'disabled' : ''}/></div>
+        <div class="field"><label>Name</label><input id="eName" value="${escapeHtml(name)}" placeholder="Sara"/></div>
+      </div>
+
+      <div class="row">
+        <div class="field"><label>Job Title</label>
+          <select id="eRole">
+            ${titles.map(r => `<option value="${escapeHtml(r)}" ${r === role ? 'selected' : ''}>${escapeHtml(r)}</option>`).join("")}
+          </select>
+        </div>
+        <div class="field"><label>Rate (per hour)</label><input id="eRate" type="number" step="0.01" value="${rate}"/></div>
+      </div>
+
+      <div class="row">
+        <div class="field"><label>Country</label><input id="eCountry" value="${escapeHtml(country)}" placeholder="Saudi Arabia"/></div>
+        <div class="field"><label>City</label><input id="eCity" value="${escapeHtml(city)}" placeholder="Riyadh"/></div>
+      </div>
+
+      <div class="row">
+        <div class="field"><label>Address</label><input id="eAddress" value="${escapeHtml(address)}" placeholder="Street, District, Building"/></div>
+      </div>
+
+      <div class="row">
+        <div class="field"><label>Date of Birth</label><input id="eDob" type="date" value="${escapeHtml(dob)}"/></div>
+        <div class="field"><label>National ID</label><input id="eNid" value="${escapeHtml(nationalId)}" placeholder="ID / Iqama"/></div>
+      </div>
+
+      <div class="row">
+        <div class="field">
+          <label>Employment Contract</label>
+          <input id="eContract" type="file" accept=".pdf,.doc,.docx,image/*" />
+          <div class="fileHint">الحالي: <b>${escapeHtml(contractName || "—")}</b></div>
+        </div>
+        <div class="field">
+          <label>NDA (عدم الإفصاح)</label>
+          <input id="eNda" type="file" accept=".pdf,.doc,.docx,image/*" />
+          <div class="fileHint">الحالي: <b>${escapeHtml(ndaName || "—")}</b></div>
+        </div>
+      </div>
+
+      <div class="actions"><button type="button" class="btn" id="${it ? 'btnUpdateEmp' : 'btnAddEmp'}">${it ? 'Update' : 'Add'}</button></div>
+      <div class="muted">بدلاً من الحذف: استخدم إخفاء/إظهار من القائمة.</div>
+    `;
+            }
+
+            if (view === "statuses") {
+                const val = it ? it._id : "";
+                return `
+      <div class="row">
+        <div class="field"><label>Status</label><input id="sVal" value="${escapeHtml(val)}" placeholder="QA"/></div>
+      </div>
+      <div class="actions"><button type="button" class="btn" id="${it ? 'btnUpdateStatus' : 'btnAddStatus'}">${it ? 'Update' : 'Add'}</button></div>
+      <div class="muted">إخفاء الحالة يمنع ظهورها في اختيارات المهام.</div>
+    `;
+            }
+
+            if (view === "priorities") {
+                const val = it ? it._id : "";
+                return `
+      <div class="row">
+        <div class="field"><label>Priority</label><input id="prVal" value="${escapeHtml(val)}" placeholder="Critical"/></div>
+      </div>
+      <div class="actions"><button type="button" class="btn" id="${it ? 'btnUpdatePriority' : 'btnAddPriority'}">${it ? 'Update' : 'Add'}</button></div>
+      <div class="muted">إخفاء الأولوية يمنع ظهورها في اختيارات المهام.</div>
+    `;
+            }
+
+            if (view === "jobtitles") {
+                const val = it ? it._id : "";
+                return `
+      <div class="row">
+        <div class="field"><label>Job Title</label><input id="jtVal" value="${escapeHtml(val)}" placeholder="QA Engineer"/></div>
+      </div>
+      <div class="actions"><button type="button" class="btn" id="${it ? 'btnUpdateJobTitle' : 'btnAddJobTitle'}">${it ? 'Update' : 'Add'}</button></div>
+      <div class="muted">إخفاء المسمى يمنع ظهوره في خيارات الموظفين.</div>
+    `;
+            }
+            return `<div class="muted">—</div>`;
+        }
+
+        /* Events */
+        document.addEventListener("click", (e) => {
+            const t = e.target;
+
+            if (t && t.classList && t.classList.contains("snav")) {
+                settingsView = t.dataset.sview;
+                settingsSelectedId = null;
+                renderSettingsTab();
+                return;
+            }
+
+            if (t && t.dataset && t.dataset.pickItem) {
+                settingsSelectedId = t.dataset.pickItem;
+                renderSettingsEditor();
+                const titleMap = { projects: "تحرير مشروع", employees: "تحرير موظف", statuses: "تحرير حالة", priorities: "تحرير أولوية", jobtitles: "تحرير مسمى" };
+                openDrawer(titleMap[settingsView] || "تحرير", `ID: ${settingsSelectedId}`);
+                return;
+            }
+
+            if (t && t.id === "btnNewItem") {
+                settingsSelectedId = null;
+                renderSettingsEditor();
+                const titleMap = { projects: "إضافة مشروع", employees: "إضافة موظف", statuses: "إضافة حالة", priorities: "إضافة أولوية", jobtitles: "إضافة مسمى" };
+                openDrawer(titleMap[settingsView] || "إضافة", "عنصر جديد");
+                return;
+            }
+
+            if (t && t.dataset && t.dataset.toggleItem) {
+                const id = t.dataset.toggleItem;
+                if (settingsView === "projects") {
+                    const p = (state.projects || []).find(x => x.id === id); if (p) { p.hidden = !p.hidden; }
+                } else if (settingsView === "employees") {
+                    const em = (state.employees || []).find(x => x.id === id); if (em) { em.hidden = !em.hidden; }
+                } else if (settingsView === "statuses") {
+                    const isHidden = (state.config.hiddenStatuses || []).includes(id);
+                    if (isHidden) {
+                        state.config.hiddenStatuses = (state.config.hiddenStatuses || []).filter(x => x !== id);
+                        if (!(state.config.statuses || []).includes(id)) state.config.statuses.push(id);
+                    } else {
+                        state.config.statuses = (state.config.statuses || []).filter(x => x !== id);
+                        if (!(state.config.hiddenStatuses || []).includes(id)) state.config.hiddenStatuses.push(id);
+                    }
+                } else if (settingsView === "priorities") {
+                    const isHidden = (state.config.hiddenPriorities || []).includes(id);
+                    if (isHidden) {
+                        state.config.hiddenPriorities = (state.config.hiddenPriorities || []).filter(x => x !== id);
+                        if (!(state.config.priorities || []).includes(id)) state.config.priorities.push(id);
+                    } else {
+                        state.config.priorities = (state.config.priorities || []).filter(x => x !== id);
+                        if (!(state.config.hiddenPriorities || []).includes(id)) state.config.hiddenPriorities.push(id);
+                    }
+                } else if (settingsView === "jobtitles") {
+                    const isHidden = (state.config.hiddenJobTitles || []).includes(id);
+                    if (isHidden) {
+                        state.config.hiddenJobTitles = (state.config.hiddenJobTitles || []).filter(x => x !== id);
+                        if (!(state.config.jobTitles || []).includes(id)) state.config.jobTitles.push(id);
+                    } else {
+                        state.config.jobTitles = (state.config.jobTitles || []).filter(x => x !== id);
+                        if (!(state.config.hiddenJobTitles || []).includes(id)) state.config.hiddenJobTitles.push(id);
+                    }
+                }
+                saveState(); renderSettingsTab(); hydrateAll(); toast("Updated", "تم التحديث");
+                return;
+            }
+
+            if (t && (t.id === "btnCloseDrawer" || t.id === "sDrawerBackdrop")) { closeDrawer(); return; }
+
+            if (t && t.id === "btnSaveGeneral") {
+                state.config.general = {
+                    currency: "USD",
+                    fxSarPerUsd: Number($("#gFx").value || 3.75),
+                    workdayHours: Number($("#gWorkday").value || 8),
+                    timezone: ($("#gTz").value || "").trim() || "Asia/Riyadh",
+                    systemName: ($("#gName").value || "").trim() || "Simt App",
+                    systemDesc: ($("#gDesc").value || "").trim() || "",
+                    logoDataUrl: pendingLogoDataUrl || (state.config.general && state.config.general.logoDataUrl) || ""
+                };
+                saveState(); toast("Saved", "تم حفظ الإعدادات العامة"); hydrateAll(); return;
+            }
+
+            if (t && t.id === "btnAddProject") {
+                const id = ($("#pId").value || "").trim(); const name = ($("#pName").value || "").trim();
+                const budget = Number($("#pBudget").value || 0);
+                if (!id) return toast("Missing", "أدخل Project ID");
+                if ((state.projects || []).some(p => p.id === id)) return toast("Exists", "Project ID موجود");
+                state.projects.push({ id, name, budget, hidden: false, createdAt: new Date().toISOString() });
+                saveState(); settingsSelectedId = id; renderSettingsTab(); hydrateAll(); toast("Added", "تمت الإضافة"); closeDrawer(); return;
+            }
+            if (t && t.id === "btnUpdateProject") {
+                const id = ($("#pId").value || "").trim(); const name = ($("#pName").value || "").trim();
+                const budget = Number($("#pBudget").value || 0);
+                const p = (state.projects || []).find(x => x.id === id);
+                if (!p) return toast("Not found", "Project غير موجود");
+                p.name = name; p.budget = budget; if (!p.createdAt) p.createdAt = new Date().toISOString();
+                saveState(); renderSettingsTab(); hydrateAll(); toast("Saved", "تم الحفظ"); closeDrawer(); return;
+            }
+
+            if (t && t.id === "btnAddEmp") {
+                const id = ($("#eId").value || "").trim(); const name = ($("#eName").value || "").trim();
+                const role = $("#eRole").value; const rate = Number($("#eRate").value || 0);
+                if (!id) return toast("Missing", "أدخل Employee ID");
+                if ((state.employees || []).some(x => x.id === id)) return toast("Exists", "Employee ID موجود");
+                state.employees.push({
+                    id, name, role, rate, hidden: false,
+                    country: ($("#eCountry") ? $("#eCountry").value : "").trim(),
+                    city: ($("#eCity") ? $("#eCity").value : "").trim(),
+                    address: ($("#eAddress") ? $("#eAddress").value : "").trim(),
+                    dob: ($("#eDob") ? $("#eDob").value : "").trim(),
+                    nationalId: ($("#eNid") ? $("#eNid").value : "").trim(),
+                    contractFile: "", ndaFile: ""
+                });
+                saveState(); settingsSelectedId = id; renderSettingsTab(); hydrateAll(); toast("Added", "تمت الإضافة"); closeDrawer(); return;
+            }
+            if (t && t.id === "btnUpdateEmp") {
+                const id = ($("#eId").value || "").trim();
+                const em = (state.employees || []).find(x => x.id === id);
+                if (!em) return toast("Not found", "Employee غير موجود");
+                em.name = ($("#eName").value || "").trim();
+                em.role = $("#eRole").value;
+                em.rate = Number($("#eRate").value || 0);
+                em.country = ($("#eCountry") ? $("#eCountry").value : "").trim();
+                em.city = ($("#eCity") ? $("#eCity").value : "").trim();
+                em.address = ($("#eAddress") ? $("#eAddress").value : "").trim();
+                em.dob = ($("#eDob") ? $("#eDob").value : "").trim();
+                em.nationalId = ($("#eNid") ? $("#eNid").value : "").trim();
+                const c = $("#eContract"); if (c && c.files && c.files[0]) em.contractFile = c.files[0].name;
+                const n = $("#eNda"); if (n && n.files && n.files[0]) em.ndaFile = n.files[0].name;
+                saveState(); renderSettingsTab(); hydrateAll(); toast("Saved", "تم الحفظ"); closeDrawer(); return;
+            }
+
+            if (t && t.id === "btnAddStatus") {
+                const v = ($("#sVal").value || "").trim();
+                if (!v) return toast("Missing", "أدخل Status");
+                if ((state.config.statuses || []).includes(v) || (state.config.hiddenStatuses || []).includes(v)) return toast("Exists", "موجود");
+                state.config.statuses.push(v);
+                saveState(); renderSettingsTab(); hydrateAll(); toast("Added", "تمت الإضافة"); closeDrawer(); return;
+            }
+            if (t && t.id === "btnUpdateStatus") {
+                const oldId = settingsSelectedId;
+                const v = ($("#sVal").value || "").trim();
+                if (!v) return toast("Missing", "أدخل Status");
+                const isHidden = (state.config.hiddenStatuses || []).includes(oldId);
+                const arrName = isHidden ? "hiddenStatuses" : "statuses";
+                state.config[arrName] = (state.config[arrName] || []).map(x => x === oldId ? v : x);
+                (state.tasks || []).forEach(ts => { if (ts.status === oldId) ts.status = v; });
+                settingsSelectedId = v;
+                saveState(); renderSettingsTab(); hydrateAll(); toast("Saved", "تم الحفظ"); closeDrawer(); return;
+            }
+
+            if (t && t.id === "btnAddPriority") {
+                const v = ($("#prVal").value || "").trim();
+                if (!v) return toast("Missing", "أدخل Priority");
+                if ((state.config.priorities || []).includes(v) || (state.config.hiddenPriorities || []).includes(v)) return toast("Exists", "موجود");
+                state.config.priorities.push(v);
+                saveState(); renderSettingsTab(); hydrateAll(); toast("Added", "تمت الإضافة"); closeDrawer(); return;
+            }
+            if (t && t.id === "btnUpdatePriority") {
+                const oldId = settingsSelectedId;
+                const v = ($("#prVal").value || "").trim();
+                if (!v) return toast("Missing", "أدخل Priority");
+                const isHidden = (state.config.hiddenPriorities || []).includes(oldId);
+                const arrName = isHidden ? "hiddenPriorities" : "priorities";
+                state.config[arrName] = (state.config[arrName] || []).map(x => x === oldId ? v : x);
+                (state.tasks || []).forEach(ts => { if (ts.priority === oldId) ts.priority = v; });
+                settingsSelectedId = v;
+                saveState(); renderSettingsTab(); hydrateAll(); toast("Saved", "تم الحفظ"); closeDrawer(); return;
+            }
+
+            if (t && t.id === "btnAddJobTitle") {
+                const v = ($("#jtVal").value || "").trim();
+                if (!v) return toast("Missing", "أدخل المسمى");
+                if ((state.config.jobTitles || []).includes(v) || (state.config.hiddenJobTitles || []).includes(v)) return toast("Exists", "موجود");
+                state.config.jobTitles.push(v);
+                saveState(); renderSettingsTab(); hydrateAll(); toast("Added", "تمت الإضافة"); closeDrawer(); return;
+            }
+            if (t && t.id === "btnUpdateJobTitle") {
+                const oldId = settingsSelectedId;
+                const v = ($("#jtVal").value || "").trim();
+                if (!v) return toast("Missing", "أدخل المسمى");
+                const isHidden = (state.config.hiddenJobTitles || []).includes(oldId);
+                const arrName = isHidden ? "hiddenJobTitles" : "jobTitles";
+                state.config[arrName] = (state.config[arrName] || []).map(x => x === oldId ? v : x);
+                (state.employees || []).forEach(emp => { if (emp.role === oldId) emp.role = v; });
+                settingsSelectedId = v;
+                saveState(); renderSettingsTab(); hydrateAll(); toast("Saved", "تم الحفظ"); closeDrawer(); return;
+            }
+        });
+
+
+        function renderOverviewInsights(projectId) {
+            const host = document.getElementById("ovInsights");
+            if (!host) return;
+            const top3 = topEmployeesForProject(projectId);
+            const avg = avgHoursForProject(projectId);
+            const monthly = monthlySummaryForProject(projectId);
+
+            const badgeHtml = (e, idx) => {
+                const labels = ["TOP 1", "TOP 2", "TOP 3"];
+                return `
+      <div class="badge">
+        <div class="rank"><i></i>${labels[idx]}</div>
+        <div class="name">${escapeHtml(e.name)}</div>
+        <div class="meta">
+          <span>${e.tasks} مهام</span>
+          <span>${e.pct.toFixed(1)}%</span>
+        </div>
+      </div>
+    `;
+            };
+
+            const maxCost = Math.max(1, ...monthly.map(r => r.cost));
+            const rows = monthly.map(r => {
+                const pctPaid = (r.cost > 0) ? Math.max(0, Math.min(100, (r.paidUSD / r.cost) * 100)) : 0;
+                const barw = (r.cost / maxCost) * 100;
+                return `
+      <tr>
+        <td>${escapeHtml(r.month)}</td>
+        <td>${r.hours.toFixed(1)}h</td>
+        <td>${formatMoneyUSD(r.cost)}</td>
+        <td>${formatMoneyUSD(r.paidUSD)} <span style="color:var(--muted)">(${pctPaid.toFixed(0)}%)</span></td>
+        <td>${formatMoneyUSD(r.unpaidUSD)}</td>
+        <td style="min-width:120px;">
+          <div class="spark"><i style="width:${barw.toFixed(0)}%"></i></div>
+        </td>
+      </tr>
+    `;
+            }).join("") || `<tr><td colspan="6">لا توجد بيانات شهرية</td></tr>`;
+
+
+            host.innerHTML = `
+    <div class="statBox fullRow">
+      <div class="k"><span class="dot"></span>أفضل مساهمين في المهام</div>
+      <div class="v">Top 3</div>
+      <div class="s">ترتيب حسب عدد المهام داخل المشروع مع نسبة مساهمة لكل موظف.</div>
+      <div class="badgesRow" style="margin-top:12px;">
+        ${top3[0] ? badgeHtml(top3[0], 0) : `<div class="badge"><div class="rank"><i></i>TOP 1</div><div class="name">—</div><div class="meta"><span>0 مهام</span><span>0%</span></div></div>`}
+        ${top3[1] ? badgeHtml(top3[1], 1) : `<div class="badge"><div class="rank"><i></i>TOP 2</div><div class="name">—</div><div class="meta"><span>0 مهام</span><span>0%</span></div></div>`}
+        ${top3[2] ? badgeHtml(top3[2], 2) : `<div class="badge"><div class="rank"><i></i>TOP 3</div><div class="name">—</div><div class="meta"><span>0 مهام</span><span>0%</span></div></div>`}
+      </div>
+    </div>
+
+    <div class="statBox fullRow">
+      <div class="k"><span class="dot"></span>مؤشرات متوسط الأداء</div>
+      <div class="v">Averages</div>
+      <div class="s">متوسط الساعات لكل مهمة ولكل موظف مشارك (من سجلات الوقت).</div>
+      <div class="avgRow" style="margin-top:12px;">
+        <div class="avgBox"><div class="k">Avg Hours / Task</div><div class="v">${avg.avgPerTask.toFixed(2)}h</div></div>
+        <div class="avgBox"><div class="k">Avg Hours / Employee</div><div class="v">${avg.avgPerEmployee.toFixed(2)}h</div></div>
+        <div class="avgBox"><div class="k">Tasks Count</div><div class="v">${avg.taskCount}</div></div>
+        <div class="avgBox"><div class="k">Employees Involved</div><div class="v">${avg.empCount}</div></div>
+      </div>
+    </div>
+
+    <div class="statBox fullRow">
+      <div class="k"><span class="dot"></span>تقرير شهري: Paid vs Unpaid</div>
+      <div class="v">Monthly</div>
+      <div class="s">آخر 6 أشهر — احتساب التكلفة من سجلات الوقت ثم مقارنتها بالمدفوعات.</div>
+      <table class="miniTable">
+        <thead>
+          <tr>
+            <th>الشهر</th><th>ساعات</th><th>Cost</th><th>Paid</th><th>Unpaid</th><th>Trend</th>
+          </tr>
+        </thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>
+  `;
+
+        }
+
+        document.addEventListener("change", (e) => {
+            const t = e.target;
+            if (t && t.id === "gLogo" && t.files && t.files[0]) {
+                const r = new FileReader();
+                r.onload = () => {
+                    pendingLogoDataUrl = String(r.result || "");
+                    const pv = $("#logoPreview");
+                    if (pv) pv.innerHTML = `<img src="${pendingLogoDataUrl}" alt="logo"/>`;
+                };
+                r.readAsDataURL(t.files[0]);
+            }
+        });
+
+
+
+
+        /* ===== Payments Tab Logic (rebuild) ===== */
+        function unpaidEndedSessionsForEmp(empId) {
+            return (state.sessions || []).filter(function (s) {
+                return s.empId === empId && !!s.end && (s.pay || "Unpaid") === "Unpaid";
+            });
+        }
+        function nextPaymentId() {
+            ensurePayments();
+            var n = (state.payments || []).length + 1;
+            var s = String(n);
+            while (s.length < 4) s = "0" + s;
+            return "PAY-" + s;
+        }
+        function fmtDate(d) {
+            if (!d) return "—";
+            try {
+                return new Date(d).toISOString().slice(0, 10);
+            } catch (e) { return String(d); }
+        }
+        function renderPaymentsTab() {
+            ensurePayments();
+
+            // Employees select
+            var sel = $("#payEmp");
+            sel.innerHTML = (activeEmployees() || []).map(function (e) {
+                return '<option value="' + e.id + '">' + e.id + ' — ' + escapeHtml(e.name) + ' (' + escapeHtml(e.role) + ')</option>';
+            }).join("");
+
+            if (!sel.value) sel.value = (state.employees && state.employees[0] ? state.employees[0].id : "");
+
+            // default date today
+            var today = new Date().toISOString().slice(0, 10);
+            $("#payDate").value = $("#payDate").value || today;
+
+            updatePayRemaining();
+            renderPaymentsList();
+        }
+        function updatePayRemaining() {
+            var empId = $("#payEmp").value;
+            var rows = unpaidEndedSessionsForEmp(empId);
+            var hours = rows.reduce(function (a, s) { return a + (Number(s.hours) || 0); }, 0);
+            $("#payRemainHours").textContent = hours.toFixed(2);
+            var oldest = rows.length ? fmtDate(rows[0].end) : "—";
+            $("#payRemainMeta").textContent = rows.length + " sessions • oldest: " + oldest;
+        }
+        function renderPaymentsList() {
+            ensurePayments();
+            var list = $("#payList");
+            var rows = (state.payments || []).slice().sort(function (a, b) {
+                return String(b.date || "").localeCompare(String(a.date || ""));
+            });
+            $("#payCount").textContent = String(rows.length);
+
+            if (!rows.length) {
+                list.innerHTML = '<div class="hint">لا توجد دفعات بعد.</div>';
+                return;
+            }
+
+            list.innerHTML = rows.map(function (p) {
+                var line1 = '<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;">'
+                    + '<div style="font-weight:900;">' + escapeHtml(p.id) + '</div>'
+                    + '<span class="pill">' + escapeHtml(p.method || "—") + '</span>'
+                    + '</div>';
+
+                var meta = '<div class="meta">'
+                    + '<span class="pill">Emp: ' + escapeHtml(p.empId) + '</span>'
+                    + '<span class="pill">Date: ' + escapeHtml(p.date || "—") + '</span>'
+                    + '<span class="pill">Hours: ' + Number(p.hours || 0).toFixed(2) + 'h</span>'
+                    + '<span class="pill">Sessions: ' + (p.sessionIds ? p.sessionIds.length : 0) + '</span>'
+                    + '</div>';
+
+                var receipt = '<div class="hint">Receipt: ' + escapeHtml(p.receiptName || "—") + '</div>';
+                var notes = p.notes ? '<div class="hint">Notes: ' + escapeHtml(p.notes) + '</div>' : '';
+                var actions = '<div class="actions">'
+                    + '<button type="button" class="btn" data-export-html="' + escapeHtml(p.id) + '">Export HTML</button>'
+                    + '<button type="button" class="btn" data-export-pdf="' + escapeHtml(p.id) + '">Export PDF</button>'
+                    + '</div>';
+
+                return '<div class="item">' + line1 + meta + receipt + notes + actions + '</div>';
+            }).join("");
+        }
+        function createPaymentCollectRemaining() {
+            ensurePayments();
+            var empId = $("#payEmp").value;
+            var rows = unpaidEndedSessionsForEmp(empId);
+            if (!rows.length) {
+                toast("No unpaid sessions", "لا يوجد ساعات غير مدفوعة للموظف.");
+                return;
+            }
+
+            var pid = nextPaymentId();
+            var date = $("#payDate").value || new Date().toISOString().slice(0, 10);
+            var method = $("#payMethod").value;
+            var receiptFile = $("#payReceipt").files && $("#payReceipt").files[0] ? $("#payReceipt").files[0] : null;
+            var receiptName = receiptFile ? receiptFile.name : "";
+            var notes = ($("#payNotes").value || "").trim();
+            var hours = rows.reduce(function (a, s) { return a + (Number(s.hours) || 0); }, 0);
+            var sessionIds = rows.map(function (s) { return s.id; });
+
+            // mark sessions paid + link
+            rows.forEach(function (s) {
+                s.pay = "Paid";
+                s.paymentId = pid;
+                s.paymentDate = date;
+            });
+
+            state.payments.unshift({
+                id: pid, empId: empId, date: date, method: method,
+                receiptName: receiptName, notes: notes,
+                hours: hours, sessionIds: sessionIds
+            });
+
+            $("#payNotes").value = "";
+            $("#payReceipt").value = "";
+            $("#payReceiptHint").textContent = "Demo: سيتم حفظ اسم الملف فقط.";
+
+            saveState();
+            updatePayRemaining();
+            renderPaymentsList();
+            toast("Payment created", pid + " • " + hours.toFixed(2) + "h");
+        }
+
+        function paymentById(pid) {
+            ensurePayments();
+            for (var i = 0; i < (state.payments || []).length; i++) {
+                if (state.payments[i].id === pid) return state.payments[i];
+            }
+            return null;
+        }
+        function buildPaymentSummaryHTML(p) {
+            var emp = (state.employees || []).find(function (e) { return e.id === p.empId; });
+            var empName = emp ? emp.name : p.empId;
+            var sessions = (state.sessions || []).filter(function (s) { return (p.sessionIds || []).indexOf(s.id) !== -1; });
+
+            var rowsHtml = sessions.map(function (s) {
+                return "<tr>"
+                    + "<td>" + escapeHtml(String(s.id)) + "</td>"
+                    + "<td>" + escapeHtml(s.taskId || "—") + "</td>"
+                    + "<td>" + escapeHtml(s.task || "—") + "</td>"
+                    + "<td>" + escapeHtml(fmtDate(s.start)) + "</td>"
+                    + "<td>" + escapeHtml(fmtDate(s.end)) + "</td>"
+                    + "<td style='text-align:left;'>" + Number(s.hours || 0).toFixed(2) + "</td>"
+                    + "</tr>";
+            }).join("");
+
+            if (!rowsHtml) rowsHtml = "<tr><td colspan='6'>—</td></tr>";
+
+            var notes = p.notes ? ("<span class='pill'>Notes: " + escapeHtml(p.notes) + "</span>") : "";
+
+            return "<!doctype html><html lang='ar' dir='rtl'><head><meta charset='utf-8'/>"
+                + "<meta name='viewport' content='width=device-width,initial-scale=1'/>"
+                + "<title>" + escapeHtml(p.id) + " — Payment Summary</title>"
+                + "<link href='https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;600;700&display=swap' rel='stylesheet'>"
+                + "<style>"
+                + "body{font-family:'IBM Plex Sans Arabic',system-ui;margin:24px;color:#0b1220}"
+                + ".box{border:1px solid #e5e7eb;border-radius:16px;padding:16px;max-width:920px;margin:auto}"
+                + "h1{margin:0 0 12px}"
+                + ".meta{display:flex;flex-wrap:wrap;gap:10px;margin:10px 0 14px}"
+                + ".pill{border:1px solid #e5e7eb;border-radius:999px;padding:6px 10px;background:#f7f7f9;font-size:13px}"
+                + "table{width:100%;border-collapse:collapse;margin-top:10px}"
+                + "th,td{border-bottom:1px solid #eee;padding:10px;font-size:13px}"
+                + "th{background:#fafafa;text-align:right}"
+                + ".actions{display:flex;gap:10px;justify-content:flex-end;margin-top:14px}"
+                + "button{border:1px solid #0b1220;background:#0b1220;color:#fff;border-radius:12px;padding:10px 12px;font-weight:700;cursor:pointer}"
+                + "button.secondary{background:transparent;color:#0b1220;border-color:#d1d5db}"
+                + "@media print{.actions{display:none} body{margin:0} .box{border:none}}"
+                + "</sty" + "le></head><body>"
+                + "<div class='box'>"
+                + "<h1>" + escapeHtml(p.id) + " — Payment Summary</h1>"
+                + "<div class='meta'>"
+                + "<span class='pill'>Employee: " + escapeHtml(empName) + " (" + escapeHtml(p.empId) + ")</span>"
+                + "<span class='pill'>Date: " + escapeHtml(p.date || "—") + "</span>"
+                + "<span class='pill'>Method: " + escapeHtml(p.method || "—") + "</span>"
+                + "<span class='pill'>Hours: " + Number(p.hours || 0).toFixed(2) + "h</span>"
+                + "<span class='pill'>Sessions: " + String((p.sessionIds || []).length) + "</span>"
+                + "</div>"
+                + "<div class='meta'>"
+                + "<span class='pill'>Receipt: " + escapeHtml(p.receiptName || "—") + "</span>"
+                + notes
+                + "</div>"
+                + "<table><thead><tr><th>ID</th><th>Task ID</th><th>Task</th><th>Start</th><th>End</th><th style='text-align:left;'>Hours</th></tr></thead>"
+                + "<tbody>" + rowsHtml + "</tbody></table>"
+                + "<div class='actions'><button class='secondary' onclick='window.close()'>إغلاق</button><button onclick='window.print()'>طباعة / PDF</button></div>"
+                + "</div></body></html>";
+        }
+        function exportPaymentHTML(pid) {
+            var p = paymentById(pid);
+            if (!p) return toast("Not found", "Payment غير موجود");
+            var html = buildPaymentSummaryHTML(p);
+            var blob = new Blob([html], { type: "text/html;charset=utf-8" });
+            var a = document.createElement("a");
+            a.href = URL.createObjectURL(blob);
+            a.download = pid + "_payment_summary.html";
+            document.body.appendChild(a);
+            a.click();
+            setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 0);
+            toast("Exported", "تم تصدير HTML");
+        }
+        function exportPaymentPDF(pid) {
+            var p = paymentById(pid);
+            if (!p) return toast("Not found", "Payment غير موجود");
+            var html = buildPaymentSummaryHTML(p);
+            var w = window.open("", "_blank");
+            w.document.open(); w.document.write(html); w.document.close();
+        }
+
+        // Payments events (delegated)
+        document.addEventListener("click", function (e) {
+            var t = e.target;
+            if (t && t.id === "btnPayCollect") return createPaymentCollectRemaining();
+            if (t && t.dataset && t.dataset.exportHtml) return exportPaymentHTML(t.dataset.exportHtml);
+            if (t && t.dataset && t.dataset.exportPdf) return exportPaymentPDF(t.dataset.exportPdf);
+        });
+        document.addEventListener("change", function (e) {
+            var t = e.target;
+            if (t && t.id === "payEmp") return updatePayRemaining();
+            if (t && t.id === "payReceipt") {
+                var f = $("#payReceipt").files && $("#payReceipt").files[0] ? $("#payReceipt").files[0] : null;
+                $("#payReceiptHint").textContent = f ? ("Selected: " + f.name) : "Demo: سيتم حفظ اسم الملف فقط.";
+            }
+        });
+
+
+
+
+
+
+
+
+        /* ===== Overview: Project Stats + Export (v18 | Employee Ranking) ===== */
+        function employeeRankingForProject(projectId) {
+            const map = {};
+            (state.tasks || []).filter(t => t.projectId === projectId).forEach(t => {
+                const a = t.assignee || "—";
+                if (!map[a]) map[a] = { tasks: 0 };
+                map[a].tasks += 1;
+            });
+            const arr = Object.keys(map).map(k => {
+                const emp = (state.employees || []).find(e => e.id === k);
+                return {
+                    id: k,
+                    name: emp ? (emp.name || emp.id) : k,
+                    tasks: map[k].tasks
+                };
+            });
+            const total = arr.reduce((s, x) => s + x.tasks, 0) || 1;
+            return arr.sort((a, b) => b.tasks - a.tasks).map(x => ({
+                ...x,
+                pct: (x.tasks / total) * 100
+            }));
+        }
+
+        /* ===== Overview: Project Stats + Export (v17 | Paid Ratio + Redesigned) ===== */
+        function formatMoneyUSD(x) { return "$" + Number(x || 0).toFixed(0); }
+        function formatMoneySARfromUSD(x) {
+            const fx = Number((state.config && state.config.general && state.config.general.fxSarPerUsd) || 3.75);
+            return (Number(x || 0) * fx).toFixed(0) + " ر.س";
+        }
+        function paymentsArray() {
+            return (state.payments || state.paymentEntries || state.payment || []);
+        }
+        function paymentHours(p) {
+            const h = (p && (p.hours ?? p.paidHours ?? p.hoursPaid));
+            const n = Number(h || 0);
+            return isFinite(n) ? n : 0;
+        }
+        function paymentAmountUSD(p) {
+            const a = (p && (p.amount ?? p.amountUsd ?? p.usd));
+            const n = Number(a || 0);
+            return isFinite(n) ? n : 0;
+        }
+        function paidForProject(projectId) {
+            let hours = 0, amount = 0;
+            paymentsArray().forEach(p => {
+                const pid = p.projectId || p.project || p.project_id;
+                if (pid === projectId) {
+                    hours += paymentHours(p);
+                    amount += paymentAmountUSD(p);
+                }
+            });
+            return { hours, amount };
+        }
+        function projectStats(projectId) {
+            const p = projectById(projectId) || { id: projectId, name: projectId, budget: 0, createdAt: "" };
+            const tasks = (state.tasks || []).filter(t => t.projectId === projectId);
+            const done = tasks.filter(t => String(t.status || "").toLowerCase() === "done").length;
+            const blocked = tasks.filter(t => String(t.status || "").toLowerCase() === "blocked").length;
+            const inprog = tasks.filter(t => String(t.status || "").toLowerCase().includes("progress")).length;
+
+            const emps = employeesWorkedOnProject(projectId);
+            const hrs = hoursForProject(projectId);
+            const cost = costForProject(projectId);
+
+            const budget = Number(p.budget || 0);
+            const over = (budget > 0 && cost > budget);
+
+            const paid = paidForProject(projectId);
+            const unpaidHours = Math.max(0, hrs - paid.hours);
+            const outstandingUSD = Math.max(0, cost - paid.amount);
+
+            const payPct = (cost > 0) ? (paid.amount / cost) * 100 : 0;
+            const payPctClamped = Math.max(0, Math.min(100, payPct));
+
+            const budgetPct = (budget > 0) ? (cost / budget) * 100 : 0;
+            const budgetPctClamped = Math.max(0, Math.min(100, budgetPct));
+
+            return {
+                p, tasksCount: tasks.length, done, blocked, inprog,
+                empsCount: emps.length, hours: hrs, cost, budget, over,
+                paidHours: paid.hours, paidUSD: paid.amount,
+                unpaidHours, outstandingUSD,
+                payPct: payPctClamped, budgetPct: budgetPctClamped
+            };
+        }
+
+
+        function monthKeyFromDate(d) {
+            const dt = (d instanceof Date) ? d : new Date(d);
+            if (isNaN(dt)) return null;
+            return dt.getFullYear() + "-" + String(dt.getMonth() + 1).padStart(2, "0");
+        }
+        function timeEntriesArray() {
+            return (state.timeEntries || state.tracking || state.entries || []);
+        }
+        function entryDate(en) {
+            return en.date || en.createdAt || en.start || en.startAt || en.startTime || en.startedAt || null;
+        }
+        function monthlySummaryForProject(projectId) {
+            const map = {}; // key -> {hours, cost, paidHours, paidUSD}
+            // time entries -> hours/cost by month
+            timeEntriesArray().forEach(en => {
+                const t = taskById(en.taskId || en.task || en.task_id);
+                if (!t || t.projectId !== projectId) return;
+                const key = monthKeyFromDate(entryDate(en) || en.end || en.endAt);
+                if (!key) return;
+                if (!map[key]) map[key] = { hours: 0, cost: 0, paidHours: 0, paidUSD: 0 };
+                const h = entryHours(en);
+                const emp = en.employeeId || en.employee || en.empId || en.emp;
+                const rate = empRateById(emp);
+                map[key].hours += h;
+                map[key].cost += h * rate;
+            });
+            // payments -> paid hours/usd by month
+            paymentsArray().forEach(p => {
+                const pid = p.projectId || p.project || p.project_id;
+                if (pid !== projectId) return;
+                const key = monthKeyFromDate(p.date || p.transferDate || p.createdAt);
+                if (!key) return;
+                if (!map[key]) map[key] = { hours: 0, cost: 0, paidHours: 0, paidUSD: 0 };
+                map[key].paidHours += paymentHours(p);
+                map[key].paidUSD += paymentAmountUSD(p);
+            });
+            const rows = Object.keys(map).sort().map(k => {
+                const r = map[k];
+                const unpaidHours = Math.max(0, r.hours - r.paidHours);
+                const unpaidUSD = Math.max(0, r.cost - r.paidUSD);
+                return { month: k, ...r, unpaidHours, unpaidUSD };
+            });
+            return rows.slice(-6); // آخر 6 أشهر
+        }
+        function topEmployeesForProject(projectId) {
+            const rank = employeeRankingForProject(projectId);
+            return rank.slice(0, 3);
+        }
+        function avgHoursForProject(projectId) {
+            const tasks = (state.tasks || []).filter(t => t.projectId === projectId);
+            const hrs = hoursForProject(projectId);
+            const taskCount = tasks.length || 1;
+            // per employee: use assignees count in tasks (unique) + those in entries
+            const empSet = new Set();
+            tasks.forEach(t => { if (t.assignee) empSet.add(t.assignee); });
+            timeEntriesArray().forEach(en => {
+                const t = taskById(en.taskId || en.task || en.task_id);
+                if (t && t.projectId === projectId) {
+                    const emp = en.employeeId || en.employee || en.empId || en.emp;
+                    if (emp) empSet.add(emp);
+                }
+            });
+            const empCount = empSet.size || 1;
+            return {
+                avgPerTask: hrs / taskCount,
+                avgPerEmployee: hrs / empCount,
+                taskCount: tasks.length,
+                empCount: empSet.size
+            };
+        }
+
+        function hydrateOverviewProjectReport() {
+            const sel = document.getElementById("ovProjectSelect");
+            const box = document.getElementById("ovProjectStats");
+            const hint = document.getElementById("ovProjectHints");
+
+            const bBar = document.getElementById("ovBudgetBar");
+            const bLeft = document.getElementById("ovBudgetLeft");
+            const bRight = document.getElementById("ovBudgetRight");
+            const bPct = document.getElementById("ovBudgetPct");
+
+            const pBar = document.getElementById("ovPayBar");
+            const pLeft = document.getElementById("ovPayLeft");
+            const pRight = document.getElementById("ovPayRight");
+            const pPct = document.getElementById("ovPayPct");
+
+            if (!sel || !box) return;
+
+            const projs = activeProjects();
+            sel.innerHTML = projs.map(p => `<option value="${p.id}">${escapeHtml(p.name || p.id)}</option>`).join("") || `<option value="">—</option>`;
+            if (!sel.value && projs[0]) sel.value = projs[0].id;
+
+            const pid = sel.value;
+            if (!pid) {
+                box.innerHTML = ""; if (hint) hint.textContent = "";
+                if (bBar) bBar.style.width = "0%"; if (bLeft) bLeft.textContent = "—"; if (bRight) bRight.textContent = "—"; if (bPct) bPct.textContent = "—";
+                if (pBar) pBar.style.width = "0%"; if (pLeft) pLeft.textContent = "—"; if (pRight) pRight.textContent = "—"; if (pPct) pPct.textContent = "—";
+                return;
+            }
+
+            const s = projectStats(pid);
+            const added = (s.p && s.p.createdAt) ? new Date(s.p.createdAt).toLocaleDateString("ar-SA") : "—";
+
+            const pill = (txt) => `<span class="pillMini">${escapeHtml(txt)}</span>`;
+
+            // Cards (boxes)
+            box.innerHTML = `
+    <div class="statBox">
+      <div class="k"><span class="dot"></span>المشروع</div>
+      <div class="v">${escapeHtml(s.p.name || s.p.id)}</div>
+      <div class="s">${pill("ID: " + s.p.id)} ${pill("أضيف: " + added)}</div>
+    </div>
+
+    <div class="statBox">
+      <div class="k"><span class="dot"></span>المهام</div>
+      <div class="v">${s.tasksCount}</div>
+      <div class="s">${pill("مكتملة: " + s.done)} ${pill("قيد العمل: " + s.inprog)} ${pill("متوقفة: " + s.blocked)}</div>
+    </div>
+
+    <div class="statBox">
+      <div class="k"><span class="dot"></span>الساعات</div>
+      <div class="v">${s.hours.toFixed(1)}h</div>
+      <div class="s">${pill("مدفوعة: " + s.paidHours.toFixed(1) + "h")} ${pill("غير مدفوعة: " + s.unpaidHours.toFixed(1) + "h")}</div>
+    </div>
+
+    <div class="statBox">
+      <div class="k"><span class="dot"></span>التكلفة</div>
+      <div class="v">${formatMoneyUSD(s.cost)}</div>
+      <div class="s">${pill("مدفوع: " + formatMoneyUSD(s.paidUSD))} ${pill("متبقي: " + formatMoneyUSD(s.outstandingUSD))}</div>
+    </div>
+
+    <div class="statBox">
+      <div class="k"><span class="dot"></span>عدد الموظفين</div>
+      <div class="v">${s.empsCount}</div>
+      <div class="s">${pill("Worked on project")}</div>
+    </div>
+
+    <div class="statBox">
+      <div class="k"><span class="dot"></span>التكلفة بالريال</div>
+      <div class="v">${formatMoneySARfromUSD(s.cost)}</div>
+      <div class="s">${pill("FX: " + Number((state.config && state.config.general && state.config.general.fxSarPerUsd) || 3.75).toFixed(2))}</div>
+    </div>
+
+    <div class="statBox">
+      <div class="k"><span class="dot"></span>المدفوع بالريال</div>
+      <div class="v">${formatMoneySARfromUSD(s.paidUSD)}</div>
+      <div class="s">${pill("نسبة الدفع: " + s.payPct.toFixed(1) + "%")}</div>
+    </div>
+
+    <div class="statBox">
+      <div class="k"><span class="dot"></span>المتبقي بالريال</div>
+      <div class="v">${formatMoneySARfromUSD(s.outstandingUSD)}</div>
+      <div class="s">${pill("Outstanding")}</div>
+    </div>
+  `;
+
+            // Budget progress
+            if (bBar && bLeft && bRight && bPct) {
+                if (s.budget > 0) {
+                    bBar.style.width = s.budgetPct.toFixed(1) + "%";
+                    bLeft.textContent = s.over ? "⚠️ تجاوز الميزانية" : "ضمن الميزانية";
+                    bRight.textContent = `ميزانية ${formatMoneyUSD(s.budget)} • تكلفة ${formatMoneyUSD(s.cost)} (≈ ${formatMoneySARfromUSD(s.cost)})`;
+                    bPct.textContent = s.budgetPct.toFixed(1) + "%";
+                } else {
+                    bBar.style.width = "0%";
+                    bLeft.textContent = "لا توجد ميزانية محددة";
+                    bRight.textContent = `تكلفة ${formatMoneyUSD(s.cost)} (≈ ${formatMoneySARfromUSD(s.cost)})`;
+                    bPct.textContent = "—";
+                }
+            }
+
+            // Payment progress (ratio)
+            if (pBar && pLeft && pRight && pPct) {
+                pBar.style.width = s.payPct.toFixed(1) + "%";
+                pLeft.textContent = `Paid ${formatMoneyUSD(s.paidUSD)} • Remaining ${formatMoneyUSD(s.outstandingUSD)}`;
+                pRight.textContent = `إجمالي ${formatMoneyUSD(s.cost)} • مدفوع ${formatMoneyUSD(s.paidUSD)}`;
+                pPct.textContent = s.payPct.toFixed(1) + "%";
+            }
+
+            renderOverviewInsights(pid);
+
+            if (hint) {
+                hint.textContent = "";
+            }
+        }
+
+
+        function renderOverviewInsights(projectId) {
+            const host = document.getElementById("ovInsights");
+            if (!host) return;
+            const top3 = topEmployeesForProject(projectId);
+            const avg = avgHoursForProject(projectId);
+            const monthly = monthlySummaryForProject(projectId);
+
+            const badgeHtml = (e, idx) => {
+                const labels = ["TOP 1", "TOP 2", "TOP 3"];
+                return `
+      <div class="badge">
+        <div class="rank"><i></i>${labels[idx]}</div>
+        <div class="name">${escapeHtml(e.name)}</div>
+        <div class="meta">
+          <span>${e.tasks} مهام</span>
+          <span>${e.pct.toFixed(1)}%</span>
+        </div>
+      </div>
+    `;
+            };
+
+            const maxCost = Math.max(1, ...monthly.map(r => r.cost));
+            const rows = monthly.map(r => {
+                const pctPaid = (r.cost > 0) ? Math.max(0, Math.min(100, (r.paidUSD / r.cost) * 100)) : 0;
+                const barw = (r.cost / maxCost) * 100;
+                return `
+      <tr>
+        <td>${escapeHtml(r.month)}</td>
+        <td>${r.hours.toFixed(1)}h</td>
+        <td>${formatMoneyUSD(r.cost)}</td>
+        <td>${formatMoneyUSD(r.paidUSD)} <span style="color:var(--muted)">(${pctPaid.toFixed(0)}%)</span></td>
+        <td>${formatMoneyUSD(r.unpaidUSD)}</td>
+        <td style="min-width:120px;">
+          <div class="spark"><i style="width:${barw.toFixed(0)}%"></i></div>
+        </td>
+      </tr>
+    `;
+            }).join("") || `<tr><td colspan="6">لا توجد بيانات شهرية</td></tr>`;
+
+            host.innerHTML = `
+    <div class="insightCard">
+      <div class="insightTitle">أفضل مساهمين في المهام <span class="pillMini">Top 3</span></div>
+      <div class="insightSub">ترتيب حسب عدد المهام داخل المشروع (مع نسبة مساهمة لكل موظف).</div>
+      <div class="badgesRow">
+        ${top3[0] ? badgeHtml(top3[0], 0) : `<div class="badge"><div class="rank"><i></i>TOP 1</div><div class="name">—</div><div class="meta"><span>0 مهام</span><span>0%</span></div></div>`}
+        ${top3[1] ? badgeHtml(top3[1], 1) : `<div class="badge"><div class="rank"><i></i>TOP 2</div><div class="name">—</div><div class="meta"><span>0 مهام</span><span>0%</span></div></div>`}
+        ${top3[2] ? badgeHtml(top3[2], 2) : `<div class="badge"><div class="rank"><i></i>TOP 3</div><div class="name">—</div><div class="meta"><span>0 مهام</span><span>0%</span></div></div>`}
+      </div>
+    </div>
+
+    <div class="insightCard">
+      <div class="insightTitle">مؤشرات متوسط الأداء <span class="pillMini">Averages</span></div>
+      <div class="insightSub">متوسط الساعات لكل مهمة ولكل موظف مشارك (اعتمادًا على سجلات الوقت).</div>
+      <div class="avgRow">
+        <div class="avgBox"><div class="k">Avg Hours / Task</div><div class="v">${avg.avgPerTask.toFixed(2)}h</div></div>
+        <div class="avgBox"><div class="k">Avg Hours / Employee</div><div class="v">${avg.avgPerEmployee.toFixed(2)}h</div></div>
+        <div class="avgBox"><div class="k">Tasks Count</div><div class="v">${avg.taskCount}</div></div>
+        <div class="avgBox"><div class="k">Employees Involved</div><div class="v">${avg.empCount}</div></div>
+      </div>
+    </div>
+
+    <div class="insightCard" style="grid-column: 1 / -1;">
+      <div class="insightTitle">تقرير شهري: Paid vs Unpaid (آخر 6 أشهر) <span class="pillMini">Monthly</span></div>
+      <div class="insightSub">يتم احتساب التكلفة من سجلات الوقت (Hours × Rate) ثم مقارنتها بالمدفوعات المسجلة.</div>
+      <table class="miniTable">
+        <thead>
+          <tr>
+            <th>الشهر</th><th>ساعات</th><th>Cost</th><th>Paid</th><th>Unpaid</th><th>Trend</th>
+          </tr>
+        </thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>
+  `;
+        }
+
+        document.addEventListener("change", (e) => {
+            if (e.target && e.target.id === "ovProjectSelect") hydrateOverviewProjectReport();
+        });
+
+        document.addEventListener("click", (e) => {
+            const t = e.target;
+            if (t && t.id === "btnExportProjectReport") {
+                const sel = document.getElementById("ovProjectSelect");
+                const pid = sel ? sel.value : "";
+                if (!pid) return toast("Missing", "اختر مشروعًا");
+
+                const s = projectStats(pid);
+                const g = (state.config && state.config.general) ? state.config.general : { systemName: "Simt App", timezone: "Asia/Riyadh", fxSarPerUsd: 3.75 };
+                const fx = Number(g.fxSarPerUsd || 3.75);
+
+                const htmlRep = `
+      <html dir="rtl" lang="ar"><head><meta charset="utf-8"/>
+      <title>Project Report - ${escapeHtml(s.p.name || s.p.id)}</title>
+      <style>
+        body{ font-family: Arial, sans-serif; margin:24px; color:#111; }
+        h1{ margin:0 0 6px; font-size:22px; }
+        .muted{ color:#666; font-size:12.5px; margin-bottom:18px; }
+        .grid{ display:grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap:12px; }
+        .card{ border:1px solid #e7e7e7; border-radius:14px; padding:14px; }
+        .k{ color:#666; font-size:12px; }
+        .v{ font-size:16px; font-weight:700; margin-top:6px; }
+        table{ width:100%; border-collapse:collapse; margin-top:14px; }
+        th,td{ border:1px solid #eee; padding:10px; font-size:12.5px; text-align:right; }
+        th{ background:#fafafa; }
+        @media print{ button{ display:none; } }
+      
+/* ===== Soft Grey Stats Background (v18) ===== */
+#ovReportsCard .statBox,
+#ovReportsCard .progressCard{
+  background: #f7f7f7;
+}
+
+
+/* ===== Insights UI (v19) ===== */
+#ovReportsCard .insightsGrid{
+  display:grid;
+  grid-template-columns: 1fr;
+  gap:12px;
+  margin-top:12px;
+}
+#ovReportsCard .insightCard{
+  border:1px solid var(--line);
+  background:#f7f7f7;
+  border-radius:18px;
+  padding:12px;
+}
+#ovReportsCard .insightTitle{
+  font-weight:950;
+  font-size:14px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+}
+#ovReportsCard .insightSub{ color:var(--muted); font-size:12px; margin-top:6px; }
+#ovReportsCard .badgesRow{
+  display:grid;
+  grid-template-columns: repeat(3, minmax(0,1fr));
+  gap:10px;
+  margin-top:12px;
+}
+#ovReportsCard .badge{
+  border:1px solid var(--line);
+  border-radius:16px;
+  padding:10px;
+  background:#fff;
+}
+#ovReportsCard .badge .rank{
+  font-weight:950;
+  font-size:12px;
+  color:#111;
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+#ovReportsCard .badge .rank i{
+  width:10px; height:10px; border-radius:999px; background: rgba(0,0,0,.65);
+  display:inline-block;
+}
+#ovReportsCard .badge .name{ font-weight:950; margin-top:8px; font-size:14px; }
+#ovReportsCard .badge .meta{ margin-top:6px; color:var(--muted); font-size:12px; display:flex; gap:8px; flex-wrap:wrap; }
+#ovReportsCard .miniTable{
+  width:100%;
+  border-collapse:collapse;
+  margin-top:12px;
+  background:#fff;
+  border:1px solid var(--line);
+  border-radius:16px;
+  overflow:hidden;
+}
+#ovReportsCard .miniTable th, #ovReportsCard .miniTable td{
+  padding:10px;
+  border-bottom:1px solid rgba(0,0,0,.06);
+  font-size:12.5px;
+  text-align:right;
+}
+#ovReportsCard .miniTable th{ background: rgba(0,0,0,.03); font-weight:900; }
+#ovReportsCard .miniTable tr:last-child td{ border-bottom:none; }
+#ovReportsCard .spark{
+  height:10px;
+  background: rgba(0,0,0,.06);
+  border-radius:999px;
+  overflow:hidden;
+}
+#ovReportsCard .spark > i{
+  display:block; height:100%; width:0%;
+  background: rgba(0,0,0,.78);
+}
+#ovReportsCard .avgRow{
+  display:grid;
+  grid-template-columns: repeat(2, minmax(0,1fr));
+  gap:10px;
+  margin-top:12px;
+}
+#ovReportsCard .avgBox{
+  border:1px solid var(--line);
+  border-radius:16px;
+  padding:10px;
+  background:#fff;
+}
+#ovReportsCard .avgBox .k{ color:var(--muted); font-size:12px; }
+#ovReportsCard .avgBox .v{ font-weight:950; font-size:16px; margin-top:6px; }
+@media (min-width: 980px){
+  #ovReportsCard .insightsGrid{ grid-template-columns: 1fr 1fr; }
+  #ovReportsCard .avgRow{ grid-template-columns: repeat(4, minmax(0,1fr)); }
+}
+
+
+/* ===== Align Insights with Report Design (v20) ===== */
+#ovReportsCard .insightCard{
+  border: 1px solid var(--line);
+  background: #f7f7f7;
+  border-radius: 18px;
+  padding: 12px;
+}
+#ovReportsCard .insightTitle{
+  font-weight:950;
+  font-size:13px;
+  color:#111;
+}
+#ovReportsCard .insightSub{ margin-top:6px; }
+#ovReportsCard .badge, #ovReportsCard .avgBox{
+  background: #f7f7f7;
+}
+
+
+/* ===== Make Insights Match Stat Boxes (v21) ===== */
+#ovReportsCard .insightsGrid{
+  display:grid;
+  grid-template-columns: repeat(2, minmax(0,1fr));
+  gap:12px;
+  margin-top:12px;
+}
+@media (min-width: 980px){
+  #ovReportsCard .insightsGrid{ grid-template-columns: repeat(4, minmax(0,1fr)); }
+}
+#ovReportsCard .insightsGrid .statBox{ height:100%; }
+#ovReportsCard .insightsGrid .fullRow{ grid-column: 1 / -1; }
+
+</style></head>
+      <body>
+        <h1>${escapeHtml(g.systemName || "Simt App")} — تقرير مشروع</h1>
+        <div class="muted">المشروع: <b>${escapeHtml(s.p.name || s.p.id)}</b> • المنطقة الزمنية: ${escapeHtml(g.timezone || "Asia/Riyadh")} • تاريخ الإصدار: ${new Date().toLocaleString("ar-SA")}</div>
+
+        <div class="grid">
+          <div class="card"><div class="k">عدد المهام</div><div class="v">${s.tasksCount}</div></div>
+          <div class="card"><div class="k">عدد الموظفين</div><div class="v">${s.empsCount}</div></div>
+          <div class="card"><div class="k">الساعات الإجمالية</div><div class="v">${s.hours.toFixed(1)}</div></div>
+          <div class="card"><div class="k">الساعات غير المدفوعة</div><div class="v">${s.unpaidHours.toFixed(1)}</div></div>
+
+          <div class="card"><div class="k">التكلفة (USD)</div><div class="v">${formatMoneyUSD(s.cost)}</div></div>
+          <div class="card"><div class="k">المدفوع (USD)</div><div class="v">${formatMoneyUSD(s.paidUSD)}</div></div>
+          <div class="card"><div class="k">نسبة الدفع</div><div class="v">${s.payPct.toFixed(1)}%</div></div>
+          <div class="card"><div class="k">المتبقي (USD)</div><div class="v">${formatMoneyUSD(s.outstandingUSD)}</div></div>
+
+          <div class="card"><div class="k">ميزانية (USD)</div><div class="v">${s.budget > 0 ? formatMoneyUSD(s.budget) : "—"}</div></div>
+          <div class="card"><div class="k">استهلاك الميزانية</div><div class="v">${s.budget > 0 ? s.budgetPct.toFixed(1) + "%" : "—"}</div></div>
+          <div class="card"><div class="k">المكتملة</div><div class="v">${s.done}</div></div>
+          <div class="card"><div class="k">المتوقفة</div><div class="v">${s.blocked}</div></div>
+        </div>
+
+        <h2 style="margin:18px 0 8px; font-size:16px;">قائمة المهام</h2>
+        <table>
+          <thead><tr><th>المهمة</th><th>الحالة</th><th>الأولوية</th><th>المسند</th></tr></thead>
+          <tbody>
+            ${(state.tasks || []).filter(t => t.projectId === pid).slice(0, 200).map(t => {
+                    const emp = (state.employees || []).find(e => e.id === t.assignee);
+                    return `<tr>
+                <td>${escapeHtml(t.title || t.id)}</td>
+                <td>${escapeHtml(t.status || "")}</td>
+                <td>${escapeHtml(t.priority || "")}</td>
+                <td>${escapeHtml(emp ? (emp.name || emp.id) : (t.assignee || ""))}</td>
+              </tr>`;
+                }).join("") || `<tr><td colspan="4">لا توجد مهام</td></tr>`}
+          </tbody>
+        </table>
+
+        
+        <h2 style="margin:18px 0 8px; font-size:16px;">ترتيب الموظفين حسب المهام</h2>
+        <table>
+          <thead><tr><th>الموظف</th><th>عدد المهام</th><th>النسبة</th></tr></thead>
+          <tbody>
+            ${employeeRankingForProject(pid).map(e => `
+              <tr>
+                <td>${escapeHtml(e.name)}</td>
+                <td>${e.tasks}</td>
+                <td>${e.pct.toFixed(1)}%</td>
+              </tr>
+            `).join("") || `<tr><td colspan="3">لا توجد بيانات</td></tr>`}
+          </tbody>
+        </table>
+
+        <h2 style="margin:18px 0 8px; font-size:16px;">ملخص المدفوعات</h2>
+
+        <table>
+          <thead><tr><th>التاريخ</th><th>المبلغ (USD)</th><th>الساعات</th><th>الطريقة</th><th>ملاحظات</th></tr></thead>
+          <tbody>
+            ${paymentsArray().filter(p => (p.projectId || p.project || p.project_id) === pid).slice(0, 200).map(p => {
+                    const d = p.date || p.transferDate || p.createdAt || "";
+                    const method = p.method || p.channel || "";
+                    const notes = p.notes || p.note || "";
+                    return `<tr>
+                <td>${escapeHtml(d ? new Date(d).toLocaleDateString("ar-SA") : "—")}</td>
+                <td>${escapeHtml(formatMoneyUSD(paymentAmountUSD(p)))}</td>
+                <td>${escapeHtml(paymentHours(p).toFixed(1))}</td>
+                <td>${escapeHtml(method)}</td>
+                <td>${escapeHtml(notes)}</td>
+              </tr>`;
+                }).join("") || `<tr><td colspan="5">لا توجد دفعات مسجلة لهذا المشروع</td></tr>`}
+          </tbody>
+        </table>
+
+        <div class="muted" style="margin-top:16px;">* تقرير Demo من بيانات المتصفح الحالية.</div>
+        <script>window.print();<\/script>
+      </body></html>
+    `;
+                const w = window.open("", "_blank");
+                w.document.open(); w.document.write(htmlRep); w.document.close();
+            }
+        });
+
+        // Hook hydrateAll to keep stats updated
+        const _oldHydrateAll_v17 = window.hydrateAll;
+        window.hydrateAll = function () {
+            try { _oldHydrateAll_v17 && _oldHydrateAll_v17(); } catch (e) { }
+            try { hydrateOverviewProjectReport(); } catch (e) { }
+        };
+
+
+
+        /* ===== Override Actions to write to Sheets when connected ===== */
+        async function sheetsLogin(employeeId, pin) {
+            const res = await apiPost({ action: "login", employeeId, pin });
+            return res;
+        }
+        async function sheetsTimeEntry(employeeId, taskId, action, note = "") {
+            const res = await apiPost({ action: "time_entry", employeeId, taskId, action, ts: new Date().toISOString(), note });
+            return res;
+        }
+        async function sheetsAddPayment(payload) {
+            const res = await apiPost({ action: "payment", ...payload });
+            return res;
+        }
+        async function sheetsAddComment(payload) {
+            const res = await apiPost({ action: "comment", ...payload });
+            return res;
+        }
+    </script>
+</body>
+
+</html>
